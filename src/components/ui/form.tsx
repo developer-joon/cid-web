@@ -33,10 +33,11 @@ export function FormField<
 
 export function useFormField() {
   const fieldContext = React.useContext(FormFieldContext);
+  if (!fieldContext.name) {
+    throw new Error('useFormField must be used within <FormField>');
+  }
   const { getFieldState, formState } = useFormContext();
-  const fieldState = getFieldState(fieldContext.name, formState);
-  if (!fieldContext) throw new Error('useFormField must be used within <FormField>');
-  return { name: fieldContext.name, ...fieldState };
+  return { name: fieldContext.name, ...getFieldState(fieldContext.name, formState) };
 }
 
 export const FormItem = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
