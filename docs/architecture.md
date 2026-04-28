@@ -27,8 +27,9 @@
 |---|---|---|---|
 | `/api/v1/auth/login` | POST | `{ username, password }` | `TokenResponse` |
 | `/api/v1/auth/refresh` | POST | `{ refreshToken }` | `TokenResponse` |
-| `/api/v1/auth/logout` | POST | `{ refreshToken }` | void |
 | `/api/v1/me` | GET | `Authorization: Bearer <access>` | `MyProfileResponse` |
+
+> **로그아웃 엔드포인트 부재 (2026-04-26 확인)**: 백엔드 OpenAPI v1 스펙에 `/api/v1/auth/logout` 가 없다. 프론트 `POST /api/auth/logout` 은 **백엔드 호출 없이 `cid_session` 쿠키 제거만** 수행한다. refresh 토큰 서버측 무효화는 백엔드가 엔드포인트를 추가하면 §8 TBD 항목으로 갱신.
 
 ```ts
 TokenResponse = {
@@ -47,7 +48,7 @@ TokenResponse = {
 | 경로 | 역할 |
 |---|---|
 | `POST /api/auth/login` | 백엔드 `/auth/login` 호출 → `TokenResponse` 받아 `cid_session` 쿠키로 암호화/발행. 응답 body 에 토큰 미포함. |
-| `POST /api/auth/logout` | 쿠키 복호화 → 백엔드 `/auth/logout` 호출 → 쿠키 제거. |
+| `POST /api/auth/logout` | `cid_session` 쿠키 제거. (백엔드 logout 엔드포인트 부재 — 위 §1 참고) |
 | `ALL  /api/proxy/[...path]` | 임의의 백엔드 호출 프록시. 쿠키에서 access 꺼내 `Authorization` 헤더 부착. 백엔드 401 시 서버측 single-flight refresh 1회 시도 → 재호출 + 쿠키 회전. refresh 실패 시 쿠키 제거 후 401 반환. |
 | `GET  /api/health` | 로드밸런서 헬스체크 (단순 200). |
 
@@ -232,6 +233,7 @@ src/
 ## 7. 변경 이력
 
 - **2026-04-25**: 초안. §0~§6 결정 (브레인스토밍 세션 1).
+- **2026-04-26**: 백엔드 OpenAPI 스펙에 `/api/v1/auth/logout` 부재 확인. §1 의 백엔드 인증 계약 표 및 BFF 라우트 표 갱신 — 프론트 logout 은 쿠키 제거만 수행.
 
 ---
 
@@ -240,3 +242,4 @@ src/
 - `accessTokenExpiresIn`, `refreshTokenExpiresIn` 의 실제 값 (분 vs 시간 vs 일).
 - "로컬 계정" 로그인 엔드포인트 향후 추가 일정.
 - LDAP 서버 다중화 지원 일정.
+- 로그아웃 시 refresh 토큰 서버측 무효화 엔드포인트 추가 일정. (현재 프론트는 쿠키 제거만 — refresh 토큰이 만료 전까지 백엔드에서 재사용 가능)
