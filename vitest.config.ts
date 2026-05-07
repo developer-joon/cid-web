@@ -12,6 +12,10 @@ export default defineConfig({
     exclude: ['tests/e2e/**', 'node_modules/**', '.next/**'],
   },
   resolve: {
-    alias: { '@': path.resolve(__dirname, './src') },
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+      // server-only throws in jsdom; stub it out for unit tests
+      'server-only': path.resolve(__dirname, './src/__mocks__/server-only.ts'),
+    },
   },
 });
