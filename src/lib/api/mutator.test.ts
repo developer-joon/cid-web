@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { apiFetch } from './mutator';
-import { ApiError } from './envelope';
 
 const fetchMock = vi.fn();
 
@@ -61,7 +60,18 @@ describe('apiFetch', () => {
     fetchMock.mockResolvedValueOnce(
       jsonResponse({ data: null, error: { code: 'VALIDATION_FAILED', message: 'bad' } }),
     );
-    await expect(apiFetch('/api/proxy/foo')).rejects.toBeInstanceOf(ApiError);
+    await expect(apiFetch('/api/proxy/foo')).rejects.toMatchObject({
+      code: 'VALIDATION_FAILED',
+      message: 'bad',
+    });
+  });
+
+  it('respects caller X-Trace-Id supplied as a Headers instance', async () => {
+    fetchMock.mockResolvedValueOnce(jsonResponse({ data: null, error: null }));
+    await apiFetch('/api/proxy/foo', { headers: new Headers({ 'X-Trace-Id': 'h-id' }) });
+    const init = fetchMock.mock.calls[0][1] as RequestInit;
+    const sent = init.headers as Record<string, string>;
+    expect(sent['X-Trace-Id']).toBe('h-id');
   });
 
   it('falls back to HTTP_<status> code when envelope is missing on error', async () => {

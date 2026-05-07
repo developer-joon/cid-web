@@ -1,5 +1,28 @@
 import { ApiError, type Envelope } from './envelope';
 
+function normalizeHeaders(input: HeadersInit | undefined): Record<string, string> {
+  if (!input) return {};
+  if (input instanceof Headers) {
+    const out: Record<string, string> = {};
+    // Headers.forEach delivers keys in lowercase (HTTP spec); preserve as-is.
+    input.forEach((v, k) => { out[k] = v; });
+    return out;
+  }
+  if (Array.isArray(input)) {
+    return Object.fromEntries(input);
+  }
+  return { ...input };
+}
+
+/** Case-insensitive header lookup. */
+function getHeader(headers: Record<string, string>, name: string): string | undefined {
+  const lower = name.toLowerCase();
+  for (const key of Object.keys(headers)) {
+    if (key.toLowerCase() === lower) return headers[key];
+  }
+  return undefined;
+}
+
 /**
  * Fetch wrapper used by Orval-generated clients and domain hooks.
  *
@@ -15,15 +38,15 @@ import { ApiError, type Envelope } from './envelope';
  * the result themselves.
  */
 export async function apiFetch<T>(url: string, init?: RequestInit): Promise<T> {
-  const callerHeaders = init?.headers as Record<string, string> | undefined;
-  const traceId = callerHeaders?.['X-Trace-Id'] ?? crypto.randomUUID();
+  const callerHeaders = normalizeHeaders(init?.headers);
+  const traceId = getHeader(callerHeaders, 'X-Trace-Id') ?? crypto.randomUUID();
 
   const response = await fetch(url, {
     ...init,
     headers: {
       Accept: 'application/json',
+      ...callerHeaders,
       'X-Trace-Id': traceId,
-      ...(callerHeaders ?? {}),
     },
     credentials: 'same-origin',
   });
