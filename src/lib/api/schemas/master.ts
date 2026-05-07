@@ -6,6 +6,7 @@ export const MasterLocationSchema = z.object({
   locSiteNm: z.string(),
   locFloorNm: z.string().optional(),
   locTpCd: z.string().optional(),
+  locDescp: z.string().optional(),
 });
 export type MasterLocation = z.infer<typeof MasterLocationSchema>;
 
