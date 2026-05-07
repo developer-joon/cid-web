@@ -6,10 +6,11 @@
  * OpenAPI spec version: v1
  */
 
-export interface RefreshRequest {
-  /**
-   * POST /auth/login 응답에서 받은 refreshToken
-   * @minLength 1
-   */
-  refreshToken: string;
+export interface CiVdiData {
+  hostNm?: string;
+  osNm?: string;
+  clsNm?: string;
+  userCompNm?: string;
+  remk?: string;
+  userNm?: string;
 }

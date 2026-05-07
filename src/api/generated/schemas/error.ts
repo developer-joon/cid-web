@@ -7,7 +7,10 @@
  */
 
 export interface Error {
+  /** 에러 코드 (ErrorCode enum) */
   code?: string;
+  /** 사람이 읽을 수 있는 메시지 */
   message?: string;
+  /** 요청 추적 ID — 응답 헤더 X-Trace-Id 와 동일 */
   traceId?: string;
 }

@@ -6,15 +6,16 @@
  * OpenAPI spec version: v1
  */
 
-export interface LoginRequest {
+export interface UpdateCiEmpRequest {
   /**
-   * LDAP 사용자 ID (uid)
-   * @minLength 1
+   * @minLength 0
+   * @maxLength 1
    */
-  username: string;
+  mainYn?: string;
   /**
-   * LDAP 비밀번호
-   * @minLength 1
+   * 비고/메모
+   * @minLength 0
+   * @maxLength 4000
    */
-  password: string;
+  remk?: string;
 }

@@ -6,10 +6,9 @@
  * OpenAPI spec version: v1
  */
 
-export interface RefreshRequest {
-  /**
-   * POST /auth/login 응답에서 받은 refreshToken
-   * @minLength 1
-   */
-  refreshToken: string;
+export interface RelationItem {
+  sourcCiId?: number;
+  trgtCiId?: number;
+  relTpId: number;
+  remk?: string;
 }

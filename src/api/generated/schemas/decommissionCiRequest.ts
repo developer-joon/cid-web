@@ -6,10 +6,10 @@
  * OpenAPI spec version: v1
  */
 
-export interface RefreshRequest {
+export interface DecommissionCiRequest {
   /**
-   * POST /auth/login 응답에서 받은 refreshToken
-   * @minLength 1
+   * @minLength 0
+   * @maxLength 500
    */
-  refreshToken: string;
+  reason?: string;
 }

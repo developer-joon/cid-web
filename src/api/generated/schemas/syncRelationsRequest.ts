@@ -5,11 +5,8 @@
  * LDAP 로그인 + JWT 인가 API
  * OpenAPI spec version: v1
  */
+import type { RelationItem } from './relationItem';
 
-export interface RefreshRequest {
-  /**
-   * POST /auth/login 응답에서 받은 refreshToken
-   * @minLength 1
-   */
-  refreshToken: string;
+export interface SyncRelationsRequest {
+  relations: RelationItem[];
 }

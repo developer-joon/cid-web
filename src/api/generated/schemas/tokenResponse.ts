@@ -7,9 +7,14 @@
  */
 
 export interface TokenResponse {
+  /** JWT Access 토큰 */
   accessToken?: string;
+  /** Access 토큰 만료까지 남은 초 */
   accessTokenExpiresIn?: number;
+  /** JWT Refresh 토큰 */
   refreshToken?: string;
+  /** Refresh 토큰 만료까지 남은 초 */
   refreshTokenExpiresIn?: number;
+  /** 토큰 스킴 */
   tokenType?: string;
 }
