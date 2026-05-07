@@ -23,6 +23,12 @@ function getHeader(headers: Record<string, string>, name: string): string | unde
   return undefined;
 }
 
+/** Extended RequestInit that allows an optional audit header. */
+export interface ApiFetchInit extends RequestInit {
+  /** When set, forwarded as the `X-Change-Reason` request header. Empty/undefined is ignored. */
+  changeReason?: string;
+}
+
 /**
  * Fetch wrapper used by Orval-generated clients and domain hooks.
  *
@@ -37,15 +43,17 @@ function getHeader(headers: Record<string, string>, name: string): string | unde
  * generated `Promise<T>` for success is `void`. Domain hooks must Zod-parse
  * the result themselves.
  */
-export async function apiFetch<T>(url: string, init?: RequestInit): Promise<T> {
-  const callerHeaders = normalizeHeaders(init?.headers);
+export async function apiFetch<T>(url: string, init?: ApiFetchInit): Promise<T> {
+  const { changeReason, ...rest } = init ?? {};
+  const callerHeaders = normalizeHeaders(rest.headers);
   const traceId = getHeader(callerHeaders, 'X-Trace-Id') ?? crypto.randomUUID();
 
   const response = await fetch(url, {
-    ...init,
+    ...rest,
     headers: {
       Accept: 'application/json',
       ...callerHeaders,
+      ...(changeReason ? { 'X-Change-Reason': changeReason } : {}),
       'X-Trace-Id': traceId,
     },
     credentials: 'same-origin',

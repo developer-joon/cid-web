@@ -88,3 +88,19 @@ describe('apiFetch', () => {
     expect(result).toBeNull();
   });
 });
+
+describe('apiFetch X-Change-Reason', () => {
+  it('attaches X-Change-Reason header when changeReason option provided', async () => {
+    fetchMock.mockResolvedValueOnce(jsonResponse({ data: null, error: null }));
+    await apiFetch('/api/proxy/foo', { changeReason: 'OS upgrade' });
+    const init = fetchMock.mock.calls[0][1] as RequestInit;
+    expect((init.headers as Record<string, string>)['X-Change-Reason']).toBe('OS upgrade');
+  });
+
+  it('does not attach X-Change-Reason when value is empty/undefined', async () => {
+    fetchMock.mockResolvedValueOnce(jsonResponse({ data: null, error: null }));
+    await apiFetch('/api/proxy/foo', { changeReason: '' });
+    const init = fetchMock.mock.calls[0][1] as RequestInit;
+    expect((init.headers as Record<string, string>)['X-Change-Reason']).toBeUndefined();
+  });
+});

@@ -126,4 +126,18 @@ describe('serverFetch', () => {
       traceId: 't1',
     });
   });
+
+  it('attaches X-Change-Reason when changeReason option provided', async () => {
+    const { getSession } = await import('@/lib/auth/server');
+    (getSession as ReturnType<typeof vi.fn>).mockResolvedValue({
+      tokens: { accessToken: 'a', refreshToken: 'r' },
+    });
+    fetchMock.mockResolvedValueOnce(jsonResponse({ data: null, error: null }));
+
+    const { serverFetch } = await import('./server-fetch');
+    await serverFetch('/api/v1/foo', { method: 'POST', changeReason: 'IDC migration' });
+
+    const init = fetchMock.mock.calls[0][1] as RequestInit;
+    expect((init.headers as Record<string, string>)['X-Change-Reason']).toBe('IDC migration');
+  });
 });
