@@ -1,6 +1,7 @@
+import Link from 'next/link';
+import type { Route } from 'next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { RoleGuard } from '@/lib/auth/rbac';
 import { getMyProfile } from '@/lib/auth/me';
 import { serverFetch } from '@/lib/api/server-fetch';
@@ -74,14 +75,9 @@ export default async function ServersPage({
       <CardHeader className="flex flex-row items-center justify-between space-y-0">
         <CardTitle className="text-base">서버 목록</CardTitle>
         <RoleGuard role="OPERATOR" myRoles={myRoles}>
-          <TooltipProvider delayDuration={200}>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button disabled aria-disabled>+ 등록</Button>
-              </TooltipTrigger>
-              <TooltipContent>다음 사이클에서 활성화됩니다.</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+          <Link href={'/servers/new' as Route}>
+            <Button>+ 등록</Button>
+          </Link>
         </RoleGuard>
       </CardHeader>
       <ServerListFilters />
