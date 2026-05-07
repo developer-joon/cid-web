@@ -123,6 +123,8 @@
 | 9.4 | "마지막 체크" 표시 X | 백엔드 부재 (§3.1) | §3.1 결정 후 |
 | 9.5 | dispatcher의 SERVER 외 케이스 = `<UnsupportedTypeCard />` | 다른 ciTpCd UI 카드 미구현 | 도메인 별 사이클 진행하며 케이스 추가 |
 
+> **2026-05-08 RBAC 정책 변경**: 사이클 #2에서 "폐기 ADMIN-only, 벤더·담당자 useYn 토글 ADMIN-only"로 구현된 결정이 운영 현실과 맞지 않음을 확인. **OPERATOR+로 완화** (서버 폐기, 벤더·담당자 활성 토글 모두). 변경 내역은 `docs/architecture.md` §7 참조.
+
 ---
 
 ## 10. 사이클별 갭 추적 인덱스

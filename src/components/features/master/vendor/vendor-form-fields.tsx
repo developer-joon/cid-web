@@ -24,7 +24,7 @@ export function VendorFormFields({
   myRoles: readonly string[];
   mode: 'create' | 'edit';
 }) {
-  const showActiveToggle = mode === 'edit' && hasRole(myRoles, 'ADMIN');
+  const showActiveToggle = mode === 'edit' && hasRole(myRoles, 'OPERATOR');
   return (
     <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
       <TextField control={control} name="vendorNm" label="벤더 명" required />

@@ -19,7 +19,7 @@ export function EmployeeFormFields({
   myRoles: readonly string[];
   mode: 'create' | 'edit';
 }) {
-  const showActiveToggle = mode === 'edit' && hasRole(myRoles, 'ADMIN');
+  const showActiveToggle = mode === 'edit' && hasRole(myRoles, 'OPERATOR');
   const deptOptions = Array.from(depts.values()).map((d) => ({ value: d.deptId, label: d.deptNm }));
   return (
     <div className="grid grid-cols-1 gap-3 md:grid-cols-2">

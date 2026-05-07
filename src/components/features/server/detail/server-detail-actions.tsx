@@ -19,7 +19,7 @@ export function ServerDetailActions({ ci, myRoles }: { ci: CiDetail; myRoles: re
           <Button>편집</Button>
         </Link>
       </RoleGuard>
-      <RoleGuard role="ADMIN" myRoles={myRoles}>
+      <RoleGuard role="OPERATOR" myRoles={myRoles}>
         <Button
           variant="outline"
           className="border-destructive/40 text-destructive"

@@ -38,11 +38,11 @@ test.describe('decommission dialog', () => {
     await expect(page.getByRole('button', { name: '폐기' })).toBeVisible();
   });
 
-  test('OPERATOR does not see 폐기 button', async ({ page }) => {
+  test('OPERATOR sees 폐기 button on detail', async ({ page }) => {
     await loginAs(page, OPER, OPER_PW);
     await page.goto('/servers');
     const firstRow = page.locator('a[href^="/servers/"]').first();
     await firstRow.click();
-    await expect(page.getByRole('button', { name: '폐기' })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: '폐기' })).toBeVisible();
   });
 });
