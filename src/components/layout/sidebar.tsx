@@ -24,7 +24,7 @@ const MENU: MenuGroup[] = [
     items: [
       { href: '/servers', icon: '🖥️', label: '서버' },
       { href: '/ip', icon: '🌐', label: 'IP 관리', disabled: true },
-      { href: '/subnet', icon: '📡', label: 'IP 대역', disabled: true },
+      { href: '/subnet', icon: '📡', label: 'IP 대역' },
       { href: '/rack', icon: '🗄️', label: '렉 관리' },
       { href: '/location', icon: '📍', label: '위치' },
     ],
