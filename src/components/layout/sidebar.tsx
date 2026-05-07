@@ -26,6 +26,7 @@ const MENU: MenuGroup[] = [
       { href: '/ip', icon: '🌐', label: 'IP 관리', disabled: true },
       { href: '/subnet', icon: '📡', label: 'IP 대역', disabled: true },
       { href: '/rack', icon: '🗄️', label: '렉 관리' },
+      { href: '/location', icon: '📍', label: '위치' },
     ],
   },
   {
@@ -46,6 +47,7 @@ const MENU: MenuGroup[] = [
   {
     title: '시스템',
     items: [
+      { href: '/dept', icon: '🏢', label: '부서' },
       { href: '/users', icon: '👥', label: '사용자', disabled: true },
       { href: '/settings', icon: '⚙️', label: '설정', disabled: true },
     ],
