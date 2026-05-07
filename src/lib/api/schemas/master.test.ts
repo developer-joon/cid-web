@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   MasterRackSchema, MasterVendorSchema, MasterEmployeeSchema, MasterDeptSchema,
   RacksPageSchema, VendorsPageSchema, EmployeesPageSchema, DeptsPageSchema,
+  MasterSubnetSchema, SubnetsPageSchema,
 } from './master';
 
 describe('Master schemas', () => {
@@ -33,5 +34,23 @@ describe('Master schemas', () => {
     expect(VendorsPageSchema.safeParse({ content: [], page: {...racks.page} }).success).toBe(true);
     expect(EmployeesPageSchema.safeParse({ content: [], page: {...racks.page} }).success).toBe(true);
     expect(DeptsPageSchema.safeParse({ content: [], page: {...racks.page} }).success).toBe(true);
+  });
+});
+
+describe('MasterSubnetSchema', () => {
+  it('parses minimal subnet', () => {
+    expect(MasterSubnetSchema.parse({ subnetId: 1, subnetCidrAddr: '10.1.0.0/24' }).subnetCidrAddr).toBe('10.1.0.0/24');
+  });
+  it('parses with all fields including upperSubnetId', () => {
+    const r = MasterSubnetSchema.parse({
+      subnetId: 2, subnetCidrAddr: '10.1.1.0/26', subnetDescp: 'web',
+      vlanId: '101', vrfNm: 'WMS', upperSubnetId: 1, ciId: 99,
+    });
+    expect(r.upperSubnetId).toBe(1);
+    expect(r.ciId).toBe(99);
+  });
+  it('parses SubnetsPageSchema with empty content', () => {
+    const page = SubnetsPageSchema.parse({ content: [], page: { number: 0, size: 20, totalElements: 0, totalPages: 0 } });
+    expect(page.content.length).toBe(0);
   });
 });

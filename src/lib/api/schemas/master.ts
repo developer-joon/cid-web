@@ -51,8 +51,20 @@ export const MasterDeptSchema = z.object({
 });
 export type MasterDept = z.infer<typeof MasterDeptSchema>;
 
+export const MasterSubnetSchema = z.object({
+  subnetId: z.number().int(),
+  subnetCidrAddr: z.string(),
+  subnetDescp: z.string().optional(),
+  vlanId: z.string().optional(),
+  vrfNm: z.string().optional(),
+  upperSubnetId: z.number().int().optional(),
+  ciId: z.number().int().optional(),
+});
+export type MasterSubnet = z.infer<typeof MasterSubnetSchema>;
+
 export const LocationsPageSchema = pageSchema(MasterLocationSchema);
 export const RacksPageSchema = pageSchema(MasterRackSchema);
 export const VendorsPageSchema = pageSchema(MasterVendorSchema);
 export const EmployeesPageSchema = pageSchema(MasterEmployeeSchema);
 export const DeptsPageSchema = pageSchema(MasterDeptSchema);
+export const SubnetsPageSchema = pageSchema(MasterSubnetSchema);
