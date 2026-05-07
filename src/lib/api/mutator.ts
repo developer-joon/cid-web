@@ -1,50 +1,54 @@
-import { ApiError } from './envelope';
+import { ApiError, type Envelope } from './envelope';
 
-export interface OrvalResponse<T> {
-  data: T;
-  status: number;
-  headers: Headers;
-}
+/**
+ * Fetch wrapper used by Orval-generated clients and domain hooks.
+ *
+ * Contract:
+ * - On 2xx with `{ data, error: null }` envelope → returns `data` typed as T.
+ * - On any non-2xx, or 2xx with `error` present → throws ApiError.
+ * - On 204 No Content → returns null cast to T.
+ * - Generates an `X-Trace-Id` if caller did not supply one. The id is included
+ *   in thrown ApiError.traceId for log correlation.
+ *
+ * Note: cid-api's OpenAPI does not declare 2xx response schemas, so Orval's
+ * generated `Promise<T>` for success is `void`. Domain hooks must Zod-parse
+ * the result themselves.
+ */
+export async function apiFetch<T>(url: string, init?: RequestInit): Promise<T> {
+  const callerHeaders = init?.headers as Record<string, string> | undefined;
+  const traceId = callerHeaders?.['X-Trace-Id'] ?? crypto.randomUUID();
 
-export async function apiFetch<T>(
-  url: string,
-  init?: RequestInit,
-): Promise<T> {
   const response = await fetch(url, {
     ...init,
     headers: {
       Accept: 'application/json',
-      ...(init?.headers ?? {}),
+      'X-Trace-Id': traceId,
+      ...(callerHeaders ?? {}),
     },
     credentials: 'same-origin',
   });
 
+  if (response.status === 204) {
+    return null as T;
+  }
+
   let body: unknown = undefined;
   const contentType = response.headers.get('content-type') ?? '';
-  if (response.status !== 204 && contentType.includes('application/json')) {
-    body = await response.json();
+  if (contentType.includes('application/json')) {
+    body = await response.json().catch(() => undefined);
   }
 
-  if (!response.ok) {
-    const envelopeError =
-      body && typeof body === 'object' && 'error' in body
-        ? (body as { error?: { code?: string; message?: string; traceId?: string } }).error
-        : undefined;
-    if (envelopeError) {
-      throw new ApiError(
-        envelopeError.code ?? `HTTP_${response.status}`,
-        envelopeError.message ?? response.statusText,
-        envelopeError.traceId,
-      );
-    }
-    throw new ApiError(`HTTP_${response.status}`, response.statusText || 'Request failed');
+  const envelope = body as Envelope<T> | undefined;
+  if (!response.ok || envelope?.error) {
+    const err = envelope?.error;
+    throw new ApiError(
+      err?.code ?? `HTTP_${response.status}`,
+      err?.message ?? response.statusText ?? 'Request failed',
+      err?.traceId ?? traceId,
+    );
   }
 
-  return {
-    data: body as never,
-    status: response.status,
-    headers: response.headers,
-  } as T;
+  return (envelope?.data ?? null) as T;
 }
 
 export default apiFetch;
