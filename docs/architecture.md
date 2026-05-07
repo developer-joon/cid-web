@@ -234,6 +234,7 @@ src/
 
 - **2026-04-25**: 초안. §0~§6 결정 (브레인스토밍 세션 1).
 - **2026-04-26**: 백엔드 OpenAPI 스펙에 `/api/v1/auth/logout` 부재 확인. §1 의 백엔드 인증 계약 표 및 BFF 라우트 표 갱신 — 프론트 logout 은 쿠키 제거만 수행.
+- **2026-05-07**: 첫 도메인 사이클 — `/servers` 목록·상세 read-only 출시. 횡단 기반 정착: mutator envelope auto-unwrap + X-Trace-Id, server-side fetch helper, error code → 한국어 매핑, paging/url-filter hooks, RBAC primitives (`hasRole`, `RoleGuard`), master prefetch + format helpers, ciTpCd 데이터 카드 dispatcher. 의도된 deviation 5건 (필터 5종 → 3종, 상태 의미 차이, 상세 탭 6종 → 2종 + 비활성 placeholder, 연결 맵/Export 다음 사이클로) 기록.
 
 ---
 
@@ -243,3 +244,9 @@ src/
 - "로컬 계정" 로그인 엔드포인트 향후 추가 일정.
 - LDAP 서버 다중화 지원 일정.
 - 로그아웃 시 refresh 토큰 서버측 무효화 엔드포인트 추가 일정. (현재 프론트는 쿠키 제거만 — refresh 토큰이 만료 전까지 백엔드에서 재사용 가능)
+
+---
+
+## 9. ciTpCd 데이터 카드 정책 (2026-05-07)
+
+CI 상세 페이지는 `ciTpCd` 별로 **다른 확장 데이터 카드**를 렌더한다. 디스패치 컴포넌트(`src/components/features/ci/data-cards/dispatcher.tsx`)가 단일 진입점이며, 새로운 ciTpCd 지원은 새 카드 추가 + dispatcher case 한 줄로 끝난다. 미지원 타입은 `<UnsupportedTypeCard />`로 폴백한다 — 빈 화면 노출 금지.
