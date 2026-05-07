@@ -239,6 +239,7 @@ src/
 - **2026-05-08 (cycle #3)**: Master CRUD 3종 — 렉/벤더/담당자. 모달 기반 등록/편집 패턴 정착(`features/master/shared/master-form-dialog.tsx`). vendor·employee의 useYn 활성 토글 (ADMIN-only 편집, 모든 사용자 "비활성 포함" 토글). 렉은 비활성 개념 자체 없음 (백엔드 UpdateRackRequest에 useYn 부재). DEPT prefetch 추가 (`getDeptsMap`).
 - **2026-05-08**: RBAC 완화 — 서버 폐기 / 벤더·담당자 활성 토글을 ADMIN-only → OPERATOR+로 변경. 운영 정책상 OPERATOR도 일상 폐기/활성화를 수행하는 것이 더 자연스러움. ADMIN 전용은 (현재 시점) 없음.
 - **2026-05-08 (cycle #8)**: 트리 master 패턴 정착 — `<TreeView>` + `<TreeSelectField>` + `buildTree()` 신규. 위치(평탄) + 부서(자기참조 트리) CRUD. DEPT 편집 시 자기 자신·자손은 부모로 선택 불가 (사이클 방지). 사이클 #4 (Subnet 트리)가 동일 컴포넌트 그대로 재사용 예정.
+- **2026-05-08 (cycle #4)**: IP 대역 (Subnet) 트리 — DEPT (#8)의 트리 패턴을 그대로 재사용. 클라이언트 측 CIDR/설명 검색 (백엔드 GET /subnets는 필터 파라미터 부재). CIDR Zod regex 간단 검증.
 
 ---
 
