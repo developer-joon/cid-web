@@ -2,8 +2,8 @@ import 'server-only';
 import { cache } from 'react';
 import { serverFetch } from '@/lib/api/server-fetch';
 import {
-  LocationsPageSchema, RacksPageSchema, VendorsPageSchema,
-  type MasterLocation, type MasterRack, type MasterVendor,
+  LocationsPageSchema, RacksPageSchema, VendorsPageSchema, DeptsPageSchema,
+  type MasterLocation, type MasterRack, type MasterVendor, type MasterDept,
 } from '@/lib/api/schemas';
 
 const LARGE_PAGE = '?page=0&size=200';
@@ -24,4 +24,10 @@ export const getVendorsMap = cache(async (): Promise<Map<number, MasterVendor>> 
   const data = await serverFetch<unknown>(`/api/v1/master/vendors${LARGE_PAGE}`);
   const parsed = VendorsPageSchema.parse(data);
   return new Map(parsed.content.map((v) => [v.vendorId, v]));
+});
+
+export const getDeptsMap = cache(async (): Promise<Map<number, MasterDept>> => {
+  const data = await serverFetch<unknown>(`/api/v1/master/depts${LARGE_PAGE}`);
+  const parsed = DeptsPageSchema.parse(data);
+  return new Map(parsed.content.map((d) => [d.deptId, d]));
 });
