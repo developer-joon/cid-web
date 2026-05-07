@@ -236,6 +236,7 @@ src/
 - **2026-04-26**: 백엔드 OpenAPI 스펙에 `/api/v1/auth/logout` 부재 확인. §1 의 백엔드 인증 계약 표 및 BFF 라우트 표 갱신 — 프론트 logout 은 쿠키 제거만 수행.
 - **2026-05-07**: 첫 도메인 사이클 — `/servers` 목록·상세 read-only 출시. 횡단 기반 정착: mutator envelope auto-unwrap + X-Trace-Id, server-side fetch helper, error code → 한국어 매핑, paging/url-filter hooks, RBAC primitives (`hasRole`, `RoleGuard`), master prefetch + format helpers, ciTpCd 데이터 카드 dispatcher. 의도된 deviation 5건 (필터 5종 → 3종, 상태 의미 차이, 상세 탭 6종 → 2종 + 비활성 placeholder, 연결 맵/Export 다음 사이클로) 기록.
 - **2026-05-07 (cycle #2)**: 서버 쓰기 사이클 — 등록·편집·폐기 출시. X-Change-Reason 헤더 옵션을 mutator/serverFetch에 추가. RHF + zodResolver 기반 폼 패턴 정착(`components/forms/*` 일반 wrapper, `features/server/forms/sections/*` 5개 섹션). DecommissionDialog로 폐기 사유(reason) 5자 이상 강제. RBAC: 등록·편집은 OPERATOR+, 폐기는 ADMIN-only. USER가 URL로 우회 진입 시 페이지 단에서 redirect.
+- **2026-05-08 (cycle #3)**: Master CRUD 3종 — 렉/벤더/담당자. 모달 기반 등록/편집 패턴 정착(`features/master/shared/master-form-dialog.tsx`). vendor·employee의 useYn 활성 토글 (ADMIN-only 편집, 모든 사용자 "비활성 포함" 토글). 렉은 비활성 개념 자체 없음 (백엔드 UpdateRackRequest에 useYn 부재). DEPT prefetch 추가 (`getDeptsMap`).
 
 ---
 
