@@ -1,13 +1,16 @@
-import type { CiDetail } from '@/lib/api/schemas';
+import type { CiDetail, MasterRack, MasterVendor } from '@/lib/api/schemas';
+import { ServerDataCard } from '@/components/features/server/detail/server-data-card';
 import { UnsupportedTypeCard } from './unsupported-type-card';
 
 export interface CiDataCardProps {
   ci: CiDetail;
-  rack?: unknown;
-  vendor?: unknown;
+  rack?: MasterRack;
+  vendor?: MasterVendor;
 }
 
-/** Dispatch by ciTpCd. SERVER wiring lands in Task 16. */
-export function CiDataCard({ ci }: CiDataCardProps) {
+export function CiDataCard({ ci, rack, vendor }: CiDataCardProps) {
+  if (ci.ciTpCd === 'SERVER' && ci.serverData) {
+    return <ServerDataCard data={ci.serverData} rack={rack} vendor={vendor} />;
+  }
   return <UnsupportedTypeCard ciTpCd={ci.ciTpCd} />;
 }
