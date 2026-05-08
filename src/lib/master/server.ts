@@ -2,8 +2,8 @@ import 'server-only';
 import { cache } from 'react';
 import { serverFetch } from '@/lib/api/server-fetch';
 import {
-  LocationsPageSchema, RacksPageSchema, VendorsPageSchema, DeptsPageSchema,
-  type MasterLocation, type MasterRack, type MasterVendor, type MasterDept,
+  LocationsPageSchema, RacksPageSchema, VendorsPageSchema, DeptsPageSchema, SubnetsPageSchema,
+  type MasterLocation, type MasterRack, type MasterVendor, type MasterDept, type MasterSubnet,
 } from '@/lib/api/schemas';
 
 const LARGE_PAGE = '?page=0&size=200';
@@ -30,4 +30,9 @@ export const getDeptsMap = cache(async (): Promise<Map<number, MasterDept>> => {
   const data = await serverFetch<unknown>(`/api/v1/master/depts${LARGE_PAGE}`);
   const parsed = DeptsPageSchema.parse(data);
   return new Map(parsed.content.map((d) => [d.deptId, d]));
+});
+
+export const getSubnetsList = cache(async (): Promise<MasterSubnet[]> => {
+  const data = await serverFetch<unknown>(`/api/v1/subnets?page=0&size=500&sort=subnetId,asc`);
+  return SubnetsPageSchema.parse(data).content;
 });
