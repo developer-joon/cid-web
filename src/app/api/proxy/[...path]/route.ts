@@ -41,7 +41,7 @@ async function callBackend(
   });
   outgoing.set('Authorization', `Bearer ${accessToken}`);
 
-  return fetch(`${BACKEND_URL}/api/v1/${path}${search}`, {
+  return fetch(`${BACKEND_URL}/${path}${search}`, {
     method,
     headers: outgoing,
     body: body && body.byteLength ? body : undefined,

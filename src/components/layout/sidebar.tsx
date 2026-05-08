@@ -1,5 +1,8 @@
+'use client';
+
 import Link from 'next/link';
 import type { Route } from 'next';
+import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 
 interface MenuItem {
@@ -54,12 +57,10 @@ const MENU: MenuGroup[] = [
   },
 ];
 
-interface SidebarProps {
-  activePath: string;
-}
-
-export function Sidebar({ activePath }: SidebarProps) {
+export function Sidebar() {
   const appName = process.env.NEXT_PUBLIC_APP_NAME || 'CMDB';
+  const activePath = usePathname();
+
   return (
     <aside className="w-[220px] flex-shrink-0 bg-sidebar text-sidebar-foreground overflow-y-auto">
       <div className="px-5 py-4 text-xl font-bold text-primary border-b border-sidebar-foreground/10">
@@ -71,7 +72,11 @@ export function Sidebar({ activePath }: SidebarProps) {
             {group.title}
           </div>
           {group.items.map((item) => {
-            const active = item.href === activePath;
+            const active =
+              item.href === '/'
+                ? activePath === '/'
+                : activePath === item.href ||
+                  activePath.startsWith(item.href + '/');
             const baseClass = cn(
               'flex items-center gap-2 px-5 py-2.5 text-sm transition-colors',
               active
