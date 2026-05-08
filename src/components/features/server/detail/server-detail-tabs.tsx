@@ -5,6 +5,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { IpsTab } from './tabs/ips-tab';
 import { EmployeesTab } from './tabs/employees-tab';
+import { RelationsTab } from './tabs/relations-tab';
 import type { MasterSubnet } from '@/lib/api/schemas';
 
 interface Props { ciId: number; subnets: readonly MasterSubnet[]; canEdit: boolean }
@@ -17,12 +18,13 @@ export function ServerDetailTabs({ ciId, subnets, canEdit }: Props) {
           <TabsList>
             <TabsTrigger value="ips">IP 주소</TabsTrigger>
             <TabsTrigger value="employees">담당자</TabsTrigger>
+            <TabsTrigger value="relations">관계</TabsTrigger>
 
-            {(['relations', 'history', 'connection-map'] as const).map((k) => (
+            {(['history', 'connection-map'] as const).map((k) => (
               <Tooltip key={k}>
                 <TooltipTrigger asChild>
                   <TabsTrigger value={k} disabled className="cursor-not-allowed opacity-60">
-                    {k === 'relations' ? '관계' : k === 'history' ? '이력' : '연결 맵'}
+                    {k === 'history' ? '이력' : '연결 맵'}
                   </TabsTrigger>
                 </TooltipTrigger>
                 <TooltipContent>다음 사이클에서 지원됩니다.</TooltipContent>
@@ -32,6 +34,7 @@ export function ServerDetailTabs({ ciId, subnets, canEdit }: Props) {
         </TooltipProvider>
         <TabsContent value="ips"><IpsTab ciId={ciId} subnets={subnets} canEdit={canEdit} /></TabsContent>
         <TabsContent value="employees"><EmployeesTab ciId={ciId} /></TabsContent>
+        <TabsContent value="relations"><RelationsTab ciId={ciId} canEdit={canEdit} /></TabsContent>
       </Tabs>
     </Card>
   );
