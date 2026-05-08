@@ -3,7 +3,8 @@ import { ApiError } from '@/lib/api/envelope';
 import { serverFetch } from '@/lib/api/server-fetch';
 import { CiDetailSchema } from '@/lib/api/schemas';
 import { getMyProfile } from '@/lib/auth/me';
-import { getLocationsMap, getRacksMap, getVendorsMap } from '@/lib/master/server';
+import { getLocationsMap, getRacksMap, getVendorsMap, getSubnetsList } from '@/lib/master/server';
+import { hasRole } from '@/lib/auth/roles';
 import { ServerDetailHeader } from '@/components/features/server/detail/server-detail-header';
 import { CiCommonInfoCard } from '@/components/features/server/detail/ci-common-info-card';
 import { CiDataCard } from '@/components/features/ci/data-cards/dispatcher';
@@ -18,14 +19,15 @@ export default async function ServerDetailPage({ params }: { params: Promise<Par
   const ciId = Number(ciIdRaw);
   if (!Number.isFinite(ciId) || ciId <= 0) notFound();
 
-  let ci, locations, racks, vendors, profile;
+  let ci, locations, racks, vendors, profile, subnets;
   try {
-    [ci, locations, racks, vendors, profile] = await Promise.all([
+    [ci, locations, racks, vendors, profile, subnets] = await Promise.all([
       serverFetch<unknown>(`/api/v1/cis/${ciId}`).then((d) => CiDetailSchema.parse(d)),
       getLocationsMap(),
       getRacksMap(),
       getVendorsMap(),
       getMyProfile(),
+      getSubnetsList(),
     ]);
   } catch (e) {
     if (e instanceof ApiError && e.code === 'NOT_FOUND') notFound();
@@ -33,6 +35,7 @@ export default async function ServerDetailPage({ params }: { params: Promise<Par
   }
 
   const myRoles = profile?.roles ?? [];
+  const canEdit = hasRole(myRoles, 'OPERATOR');
   const location = ci.locId !== undefined ? locations.get(ci.locId) : undefined;
   const rack = ci.serverData?.rackId !== undefined ? racks.get(ci.serverData.rackId) : undefined;
   const vendor = ci.serverData?.vendorId !== undefined ? vendors.get(ci.serverData.vendorId) : undefined;
@@ -42,7 +45,7 @@ export default async function ServerDetailPage({ params }: { params: Promise<Par
       <ServerDetailHeader ci={ci} myRoles={myRoles} />
       <CiCommonInfoCard ci={ci} location={location} />
       <CiDataCard ci={ci} rack={rack} vendor={vendor} />
-      <ServerDetailTabs ciId={ciId} />
+      <ServerDetailTabs ciId={ciId} subnets={subnets} canEdit={canEdit} />
     </div>
   );
 }

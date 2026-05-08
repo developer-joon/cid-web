@@ -5,10 +5,11 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { IpsTab } from './tabs/ips-tab';
 import { EmployeesTab } from './tabs/employees-tab';
+import type { MasterSubnet } from '@/lib/api/schemas';
 
-interface Props { ciId: number; }
+interface Props { ciId: number; subnets: readonly MasterSubnet[]; canEdit: boolean }
 
-export function ServerDetailTabs({ ciId }: Props) {
+export function ServerDetailTabs({ ciId, subnets, canEdit }: Props) {
   return (
     <Card>
       <Tabs defaultValue="ips">
@@ -29,7 +30,7 @@ export function ServerDetailTabs({ ciId }: Props) {
             ))}
           </TabsList>
         </TooltipProvider>
-        <TabsContent value="ips"><IpsTab ciId={ciId} /></TabsContent>
+        <TabsContent value="ips"><IpsTab ciId={ciId} subnets={subnets} canEdit={canEdit} /></TabsContent>
         <TabsContent value="employees"><EmployeesTab ciId={ciId} /></TabsContent>
       </Tabs>
     </Card>
