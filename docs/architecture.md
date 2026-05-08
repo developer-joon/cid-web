@@ -243,6 +243,7 @@ src/
 - **2026-05-08 (cycle #5)**: IP CRUD — CI 상세의 IP 탭에 등록/편집/회수 액션 추가. cid-api에 `GET /ips` 부재로 글로벌 `/ip` 페이지는 보류. Subnet은 TreeSelectField로 선택. PATCH `unassignCi=true` 로 회수.
 - **2026-05-08 (cycle #6)**: 서버 관계 — read + 단건 추가/삭제. 양방향 표시(forward/backward 두 섹션). Diff sync PUT은 follow-up 사이클에서 (전체 일괄 편집 UI). 백엔드 응답 형태 미상이라 Zod union으로 두 모양(`{forward,backward}` vs flat array) 모두 수용.
 - **2026-05-08 (cycle #7)**: CI 이력 — Envers 기반 revision timeline + 클릭 시 시점 스냅샷. revType 응답이 enum string 또는 0/1/2 정수 두 형태일 가능성 → Zod union으로 모두 수용. snapshot 응답은 CiDetail의 부분집합 가정 + passthrough.
+- **2026-05-08 (fix)**: 런타임 버그 수정 — `/api/proxy/[...path]` 가 백엔드 URL을 만들 때 `/api/v1/`를 한 번 더 붙여 모든 클라이언트 mutation·query가 404로 실패하던 문제 수정. 사이드바 active 표시가 항상 `/`로 고정되어 있던 문제도 동시에 해결 (`usePathname()` 로 동적, `startsWith` 중첩 경로 매칭). 종합 e2e 테스트 12종 추가.
 
 ---
 
