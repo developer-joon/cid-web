@@ -4,7 +4,7 @@
 > 각 항목은 최종적으로 다음 셋 중 하나로 결정한다 — `[remove]` 웹에서 제외, `[backend]` API 추가 요청, `[compromise]` 차선책으로 흡수.
 > 결정이 나면 해당 줄을 갱신하고 영향 받는 ADR/스펙을 반영한다.
 
-마지막 업데이트: 2026-05-08 (사이클 #5 IP CRUD 종료 시점)
+마지막 업데이트: 2026-05-08 (사이클 #6 Relations 종료 시점)
 
 ---
 
@@ -77,9 +77,11 @@
 
 | # | 항목 | 처리 |
 |---|---|---|
-| 6.1 | `RelationItem` payload만 정의됨 — 응답 시 `relId`, `direction`("FWD"/"BWD"), `fwdLblNm`, `bwdLblNm` 등 동반 여부 미상 | 관계 편집 사이클 #6에서 첫 호출 검증. 라벨이 응답에 없으면 별도 `/relTypes` 호출 필요 |
+| 6.1 | `RelationItem` payload만 정의됨 — 응답 시 `relId`, `direction`("FWD"/"BWD"), `fwdLblNm`, `bwdLblNm` 등 동반 여부 미상 | 관계 편집 사이클 #6에서 첫 호출 검증. 라벨이 응답에 없으면 별도 `/relTypes` 호출 필요 | [backend] `/relTypes` endpoint 추가 후 라벨 표시 가능 |
 | 6.2 | History 응답의 rev 메타 (작업자, 일시, X-Change-Reason) 형식 미상 | History 사이클 #7 |
 | 6.3 | 시점 스냅샷 응답 — `/cis/{ciId}/history/{rev}`이 단건 CI 상세 형태인지 diff 형태인지 미상 | 동상 |
+| 6.4 | `/relTypes` endpoint 부재 — 관계 타입 이름 조회 불가 | 사이클 #6 | [backend] 엔드포인트 추가 시 `relTpId` NumberField를 라벨 SelectField로 교체. 현재는 ID 직접 입력으로 대체 |
+| 6.5 | `GET /cis/{ciId}/relations` 응답 형태 미상 — `{forward, backward}` 객체인지 flat array인지 불명 | 사이클 #6 | [compromise] Zod union으로 양쪽 수용 (`CiRelationsResponseSchema`). 백엔드가 형태 확정 후 union 제거 가능 |
 
 ---
 
@@ -138,7 +140,7 @@
 | #3 Master CRUD ✅ | (없음) | (없음) |
 | #4 IP 대역 ✅ | 5.4, 5.5 | 5.3 |
 | #5 IP 관리 ✅ | (없음) | 5.2 (부분: CI 탭 구현. 5.1은 [backend] 결정으로 전환, 글로벌 /ip 페이지는 백엔드 GET 추가 후) |
-| #6 관계 편집 (예정) | TBD | 6.1, 9.3 |
+| #6 관계 편집 ✅ partial | 6.4 (/relTypes 부재), 6.5 (응답 형태 미상) | 6.1 partial ([backend] 결정), 9.3 partial (관계 탭 활성화; history/연결맵은 #7 예정) |
 | #7 이력 (예정) | TBD | 6.2, 6.3, 9.3 |
 | #8 트리 master ✅ | (없음 — 가정 맞음) | (해당 없음 — 신규 도메인) |
 
