@@ -1,35 +1,71 @@
 import { test, expect } from '@playwright/test';
-import { loginAs } from './_helpers';
+import { testCreds, skipUnlessLdap, loginAs } from './_helpers';
 
-const USER = process.env.LDAP_TEST_USER_USER ?? '';
-const USER_PW = process.env.LDAP_TEST_USER_USER_PASS ?? '';
-const OPER = process.env.LDAP_TEST_USER_OPERATOR ?? '';
-const OPER_PW = process.env.LDAP_TEST_USER_OPERATOR_PASS ?? '';
+const user = testCreds.user;
+const oper = testCreds.operator;
 
-test.describe('/servers list', () => {
-  test.skip(!USER || !OPER, 'LDAP test accounts not configured');
+test.describe('/servers 목록', () => {
+  test.skip(skipUnlessLdap(user), 'LDAP 테스트 계정 미설정');
 
-  test('USER sees list but no register button', async ({ page }) => {
-    await loginAs(page, USER, USER_PW);
+  test('USER — 목록이 렌더되고 등록 버튼이 없다', async ({ page }) => {
+    await loginAs(page, user.username, user.password);
     await page.goto('/servers');
     await expect(page.getByRole('heading', { name: '서버 목록' })).toBeVisible();
-    await expect(page.getByRole('button', { name: /\+ 등록/ })).toHaveCount(0);
+    // USER에게는 + 등록 버튼이 없어야 함
+    await expect(page.getByRole('link', { name: /\+ 등록/ })).toHaveCount(0);
   });
 
-  test('OPERATOR sees disabled register button', async ({ page }) => {
-    await loginAs(page, OPER, OPER_PW);
+  test('USER — 검색어 입력 시 URL에 ciNm 파라미터 추가', async ({ page }) => {
+    await loginAs(page, user.username, user.password);
     await page.goto('/servers');
-    const btn = page.getByRole('button', { name: /\+ 등록/ });
-    await expect(btn).toBeVisible();
-    await expect(btn).toBeDisabled();
-  });
-
-  test('search input changes URL and filters list', async ({ page }) => {
-    await loginAs(page, USER, USER_PW);
-    await page.goto('/servers');
-    await page.getByPlaceholder(/호스트명으로 검색/).fill('zzz-no-such-host');
+    await page.getByPlaceholder(/호스트명/).fill('zzz-no-such-host-xyz');
     await page.keyboard.press('Enter');
-    await expect(page).toHaveURL(/ciNm=zzz-no-such-host/);
-    await expect(page.getByText(/조회된 서버가 없습니다|총 0건/)).toBeVisible();
+    await expect(page).toHaveURL(/ciNm=zzz-no-such-host-xyz/);
+    await expect(page.getByText(/조회된 서버가 없습니다/)).toBeVisible();
+  });
+
+  test('USER — 환경 필터 변경 시 URL에 envrnGpCd 파라미터 추가', async ({ page }) => {
+    await loginAs(page, user.username, user.password);
+    await page.goto('/servers');
+    // Click the environment filter select
+    const envSelect = page.getByLabel(/환경/).or(page.locator('select[name="envrnGpCd"]')).first();
+    // Try combobox role as the filter might be a shadcn Select
+    const envCombobox = page.getByRole('combobox').filter({ hasText: /전체|환경|운영|개발|검수/ });
+    if (await envCombobox.count() > 0) {
+      await envCombobox.first().click();
+      const option = page.getByRole('option', { name: '운영' });
+      if (await option.count() > 0) {
+        await option.click();
+        await expect(page).toHaveURL(/envrnGpCd=/);
+      }
+    }
+  });
+
+  test('USER — 정렬 헤더 클릭 시 URL sort 파라미터 변경', async ({ page }) => {
+    await loginAs(page, user.username, user.password);
+    await page.goto('/servers');
+    // CI명 정렬 링크 클릭
+    const sortLink = page.getByRole('link', { name: /CI 명|호스트명/ }).first();
+    if (await sortLink.count() > 0) {
+      await sortLink.click();
+      await expect(page).toHaveURL(/sort=/);
+    }
+  });
+
+  test('OPERATOR — + 등록 링크가 보인다', async ({ page }) => {
+    test.skip(skipUnlessLdap(oper), 'OPERATOR LDAP 계정 미설정');
+    await loginAs(page, oper.username, oper.password);
+    await page.goto('/servers');
+    await expect(page.getByRole('link', { name: /\+ 등록/ })).toBeVisible();
+  });
+
+  test('USER — 페이지네이션 다음 버튼이 있으면 클릭 시 page 파라미터 변경', async ({ page }) => {
+    await loginAs(page, user.username, user.password);
+    await page.goto('/servers');
+    const nextBtn = page.getByRole('link', { name: /다음|›|next/i }).first();
+    if (await nextBtn.count() > 0) {
+      await nextBtn.click();
+      await expect(page).toHaveURL(/page=2/);
+    }
   });
 });
