@@ -20,11 +20,12 @@ describe('HistoryEntrySchema', () => {
 });
 
 describe('HistoryPageSchema', () => {
-  it('parses standard page envelope', () => {
+  it('parses plain Spring PageImpl shape', () => {
     const r = HistoryPageSchema.parse({
       content: [{ rev: 1 }],
-      page: { number: 0, size: 20, totalElements: 1, totalPages: 1 },
+      number: 0, size: 20, totalElements: 1, totalPages: 1,
     });
-    expect(r.content[0].rev).toBe(1);
+    expect(r.content[0]?.rev).toBe(1);
+    expect(r.page.totalElements).toBe(1);
   });
 });

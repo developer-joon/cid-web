@@ -28,12 +28,23 @@ describe('Master schemas', () => {
   it('rejects invalid useYn enum', () => {
     expect(MasterVendorSchema.safeParse({ vendorId: 1, vendorNm: 'x', useYn: 'YES' }).success).toBe(false);
   });
-  it('parses paged shapes', () => {
-    const racks = RacksPageSchema.parse({ content: [], page: { number: 0, size: 20, totalElements: 0, totalPages: 0 }});
+  it('parses plain Spring PageImpl shape (master APIs)', () => {
+    const plainPage = { content: [], number: 0, size: 20, totalElements: 0, totalPages: 0 };
+    const racks = RacksPageSchema.parse(plainPage);
     expect(racks.content.length).toBe(0);
-    expect(VendorsPageSchema.safeParse({ content: [], page: {...racks.page} }).success).toBe(true);
-    expect(EmployeesPageSchema.safeParse({ content: [], page: {...racks.page} }).success).toBe(true);
-    expect(DeptsPageSchema.safeParse({ content: [], page: {...racks.page} }).success).toBe(true);
+    expect(racks.page.totalElements).toBe(0);
+    expect(VendorsPageSchema.safeParse(plainPage).success).toBe(true);
+    expect(EmployeesPageSchema.safeParse(plainPage).success).toBe(true);
+    expect(DeptsPageSchema.safeParse(plainPage).success).toBe(true);
+  });
+
+  it('parses plain page with items', () => {
+    const r = RacksPageSchema.parse({
+      content: [{ rackId: 1, rackLocCd: 'A-01', locId: 1 }],
+      number: 0, size: 20, totalElements: 1, totalPages: 1,
+    });
+    expect(r.content[0]?.rackLocCd).toBe('A-01');
+    expect(r.page.totalElements).toBe(1);
   });
 });
 
@@ -49,8 +60,8 @@ describe('MasterSubnetSchema', () => {
     expect(r.upperSubnetId).toBe(1);
     expect(r.ciId).toBe(99);
   });
-  it('parses SubnetsPageSchema with empty content', () => {
-    const page = SubnetsPageSchema.parse({ content: [], page: { number: 0, size: 20, totalElements: 0, totalPages: 0 } });
+  it('parses SubnetsPageSchema with plain Spring PageImpl shape', () => {
+    const page = SubnetsPageSchema.parse({ content: [], number: 0, size: 20, totalElements: 0, totalPages: 0 });
     expect(page.content.length).toBe(0);
   });
 });
