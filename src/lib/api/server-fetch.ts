@@ -60,14 +60,31 @@ export async function serverFetch<T>(path: string, init?: ServerFetchInit): Prom
   const ct = response.headers.get('content-type') ?? '';
   if (ct.includes('application/json')) body = await response.json().catch(() => undefined);
 
-  const envelope = body as Envelope<T> | undefined;
-  if (!response.ok || envelope?.error) {
-    const err = envelope?.error;
+  // Detect envelope shape: { data?, error? } — used by auth/me endpoints.
+  // Non-envelope responses (HATEOAS, plain Spring Page, etc.) are returned as-is.
+  const obj = body !== null && typeof body === 'object' ? (body as Record<string, unknown>) : null;
+  const isEnvelope = obj !== null && ('data' in obj || 'error' in obj);
+
+  if (isEnvelope) {
+    const envelope = body as Envelope<T>;
+    if (!response.ok || envelope.error) {
+      const err = envelope.error;
+      throw new ApiError(
+        err?.code ?? `HTTP_${response.status}`,
+        err?.message ?? response.statusText ?? 'Request failed',
+        err?.traceId ?? traceId,
+      );
+    }
+    return (envelope.data ?? null) as T;
+  }
+
+  // Non-envelope: throw on HTTP error, return body on success.
+  if (!response.ok) {
     throw new ApiError(
-      err?.code ?? `HTTP_${response.status}`,
-      err?.message ?? response.statusText ?? 'Request failed',
-      err?.traceId ?? traceId,
+      `HTTP_${response.status}`,
+      response.statusText ?? 'Request failed',
+      traceId,
     );
   }
-  return (envelope?.data ?? null) as T;
+  return body as T;
 }

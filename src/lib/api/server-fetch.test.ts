@@ -140,4 +140,28 @@ describe('serverFetch', () => {
     const init = fetchMock.mock.calls[0][1] as RequestInit;
     expect((init.headers as Record<string, string>)['X-Change-Reason']).toBe('IDC migration');
   });
+
+  it('returns raw body for non-envelope JSON responses (plain Spring Page, HATEOAS)', async () => {
+    const { getSession } = await import('@/lib/auth/server');
+    (getSession as ReturnType<typeof vi.fn>).mockResolvedValue({
+      tokens: { accessToken: 'a', refreshToken: 'r' },
+    });
+    const plainPage = { content: [{ id: 1 }], number: 0, size: 20, totalElements: 1, totalPages: 1 };
+    fetchMock.mockResolvedValueOnce(jsonResponse(plainPage));
+
+    const { serverFetch } = await import('./server-fetch');
+    const result = await serverFetch('/api/v1/master/racks');
+    expect(result).toEqual(plainPage);
+  });
+
+  it('throws on non-ok status for non-envelope responses', async () => {
+    const { getSession } = await import('@/lib/auth/server');
+    (getSession as ReturnType<typeof vi.fn>).mockResolvedValue({
+      tokens: { accessToken: 'a', refreshToken: 'r' },
+    });
+    fetchMock.mockResolvedValueOnce(new Response('', { status: 500, statusText: 'Internal Server Error' }));
+
+    const { serverFetch } = await import('./server-fetch');
+    await expect(serverFetch('/api/v1/master/racks')).rejects.toMatchObject({ code: 'HTTP_500' });
+  });
 });

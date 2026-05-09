@@ -29,7 +29,7 @@ function pickEntries(sp: SearchParams): [string, string][] {
 
 export default async function RackListPage({ searchParams }: { searchParams: Promise<SearchParams> }) {
   const sp = await searchParams;
-  const paging = parsePaging(new URLSearchParams(pickEntries(sp)), 'rackId,desc');
+  const paging = parsePaging(new URLSearchParams(pickEntries(sp)));
   const back = toBackendPageable(paging);
 
   const qs = new URLSearchParams({
