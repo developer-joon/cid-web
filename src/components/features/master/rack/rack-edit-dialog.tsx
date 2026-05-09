@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
@@ -15,6 +16,7 @@ import type { MasterLocation, MasterRack } from '@/lib/api/schemas';
 
 export function RackEditTrigger({ row, locations }: { row: MasterRack; locations: Map<number, MasterLocation> }) {
   const [open, setOpen] = useState(false);
+  const router = useRouter();
   const form = useForm<RackFormValues>({
     resolver: zodResolver(rackFormSchema),
     defaultValues: { rackLocCd: row.rackLocCd, locId: row.locId, remk: row.remk ?? '' },
@@ -28,6 +30,7 @@ export function RackEditTrigger({ row, locations }: { row: MasterRack; locations
       await update.mutateAsync({ payload: toRackUpdate(form.getValues()) });
       toast.success('수정되었습니다.');
       setOpen(false);
+      router.refresh();
     } catch (e) {
       const t = formatErrorForToast(e);
       toast.error(t.title, { description: t.description });

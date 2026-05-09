@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
@@ -17,6 +18,7 @@ interface Props { ciId: number; subnets: readonly MasterSubnet[] }
 
 export function IpCreateButton({ ciId, subnets }: Props) {
   const [open, setOpen] = useState(false);
+  const router = useRouter();
   const form = useForm<IpFormValues>({ resolver: zodResolver(ipFormSchema), defaultValues: defaultIpFormValues });
   const create = useCreateIpForCi(ciId);
 
@@ -28,6 +30,7 @@ export function IpCreateButton({ ciId, subnets }: Props) {
       toast.success('IP가 등록되었습니다.');
       form.reset(defaultIpFormValues);
       setOpen(false);
+      router.refresh();
     } catch (e) {
       const t = formatErrorForToast(e);
       toast.error(t.title, { description: t.description });

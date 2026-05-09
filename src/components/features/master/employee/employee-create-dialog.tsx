@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
@@ -15,6 +16,7 @@ import type { MasterDept } from '@/lib/api/schemas';
 
 export function EmployeeCreateButton({ depts, myRoles }: { depts: Map<number, MasterDept>; myRoles: readonly string[] }) {
   const [open, setOpen] = useState(false);
+  const router = useRouter();
   const form = useForm<EmployeeFormValues>({ resolver: zodResolver(employeeFormSchema), defaultValues: defaultEmployeeFormValues });
   const create = useCreateEmployee();
 
@@ -27,6 +29,7 @@ export function EmployeeCreateButton({ depts, myRoles }: { depts: Map<number, Ma
       toast.success('등록되었습니다.');
       form.reset(defaultEmployeeFormValues);
       setOpen(false);
+      router.refresh();
     } catch (e) {
       const t = formatErrorForToast(e);
       toast.error(t.title, { description: t.description });

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
@@ -17,6 +18,7 @@ interface Props { row: CiIpItem; ciId: number; subnets: readonly MasterSubnet[] 
 
 export function IpEditTrigger({ row, ciId, subnets }: Props) {
   const [open, setOpen] = useState(false);
+  const router = useRouter();
   const form = useForm<IpFormValues>({
     resolver: zodResolver(ipFormSchema),
     defaultValues: {
@@ -38,6 +40,7 @@ export function IpEditTrigger({ row, ciId, subnets }: Props) {
       await update.mutateAsync({ payload: toIpUpdate(form.getValues()) });
       toast.success('IP가 수정되었습니다.');
       setOpen(false);
+      router.refresh();
     } catch (e) {
       const t = formatErrorForToast(e);
       toast.error(t.title, { description: t.description });

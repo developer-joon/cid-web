@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
@@ -15,6 +16,7 @@ import type { MasterVendor } from '@/lib/api/schemas';
 
 export function VendorEditTrigger({ row, myRoles }: { row: MasterVendor; myRoles: readonly string[] }) {
   const [open, setOpen] = useState(false);
+  const router = useRouter();
   const form = useForm<VendorFormValues>({
     resolver: zodResolver(vendorFormSchema),
     defaultValues: {
@@ -36,6 +38,7 @@ export function VendorEditTrigger({ row, myRoles }: { row: MasterVendor; myRoles
       await update.mutateAsync({ payload: toVendorUpdate(form.getValues()) });
       toast.success('수정되었습니다.');
       setOpen(false);
+      router.refresh();
     } catch (e) {
       const t = formatErrorForToast(e);
       toast.error(t.title, { description: t.description });

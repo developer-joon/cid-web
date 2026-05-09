@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
@@ -14,6 +15,7 @@ import { formatErrorForToast } from '@/lib/api/error-messages';
 
 export function VendorCreateButton({ myRoles }: { myRoles: readonly string[] }) {
   const [open, setOpen] = useState(false);
+  const router = useRouter();
   const form = useForm<VendorFormValues>({ resolver: zodResolver(vendorFormSchema), defaultValues: defaultVendorFormValues });
   const create = useCreateVendor();
 
@@ -26,6 +28,7 @@ export function VendorCreateButton({ myRoles }: { myRoles: readonly string[] }) 
       toast.success('등록되었습니다.');
       form.reset(defaultVendorFormValues);
       setOpen(false);
+      router.refresh();
     } catch (e) {
       const t = formatErrorForToast(e);
       toast.error(t.title, { description: t.description });

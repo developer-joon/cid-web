@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
@@ -36,6 +37,7 @@ interface Props {
 
 export function SubnetEditTrigger({ row, allSubnets }: Props) {
   const [open, setOpen] = useState(false);
+  const router = useRouter();
   const disabledIds = descendants(row.subnetId, allSubnets);
   const form = useForm<SubnetFormValues>({
     resolver: zodResolver(subnetFormSchema),
@@ -57,6 +59,7 @@ export function SubnetEditTrigger({ row, allSubnets }: Props) {
       await update.mutateAsync({ payload: toSubnetUpdate(form.getValues()) });
       toast.success('수정되었습니다.');
       setOpen(false);
+      router.refresh();
     } catch (e) {
       const t = formatErrorForToast(e);
       toast.error(t.title, { description: t.description });
