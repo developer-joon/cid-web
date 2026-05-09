@@ -32,6 +32,13 @@ export function LoginForm() {
   const params = useSearchParams();
   const [submitting, setSubmitting] = React.useState(false);
   const [serverError, setServerError] = React.useState<string | null>(null);
+  // Disable submit until React hydrates; prevents pre-hydration native GET
+  // submission (would expose credentials in the URL) and lets Playwright's
+  // auto-wait for `enabled` synchronize with hydration.
+  const [hydrated, setHydrated] = React.useState(false);
+  React.useEffect(() => {
+    setHydrated(true);
+  }, []);
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -145,7 +152,7 @@ export function LoginForm() {
           </Alert>
         ) : null}
 
-        <Button type="submit" className="w-full h-11" disabled={submitting}>
+        <Button type="submit" className="w-full h-11" disabled={!hydrated || submitting}>
           {submitting ? '로그인 중…' : 'LDAP 로그인'}
         </Button>
       </form>

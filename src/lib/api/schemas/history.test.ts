@@ -17,6 +17,13 @@ describe('HistoryEntrySchema', () => {
   it('parses minimal entry', () => {
     expect(HistoryEntrySchema.parse({ rev: 99 }).rev).toBe(99);
   });
+  it('tolerates null fields (changeReason, username, revDt)', () => {
+    const e = HistoryEntrySchema.parse({
+      rev: 45, revType: 'ADD', changeReason: null, username: null, revDt: null,
+    });
+    expect(e.rev).toBe(45);
+    expect(e.changeReason).toBeNull();
+  });
 });
 
 describe('HistoryPageSchema', () => {
@@ -27,5 +34,19 @@ describe('HistoryPageSchema', () => {
     });
     expect(r.content[0]?.rev).toBe(1);
     expect(r.page.totalElements).toBe(1);
+  });
+  it('parses bare array (history endpoint returns flat list)', () => {
+    const r = HistoryPageSchema.parse([
+      { rev: 45, revType: 'ADD' },
+      { rev: 44, revType: 'MODIFY' },
+    ]);
+    expect(r.content).toHaveLength(2);
+    expect(r.page.totalElements).toBe(2);
+  });
+  it('parses empty bare array', () => {
+    const r = HistoryPageSchema.parse([]);
+    expect(r.content).toHaveLength(0);
+    expect(r.page.totalElements).toBe(0);
+    expect(r.page.totalPages).toBe(0);
   });
 });

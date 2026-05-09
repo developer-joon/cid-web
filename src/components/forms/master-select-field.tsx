@@ -21,17 +21,17 @@ export function MasterSelectField<TForm extends FieldValues>({ control, name, la
       render={({ field }) => (
         <FormItem>
           <FormLabel>{label}</FormLabel>
-          <FormControl>
-            <Select
-              value={field.value === undefined || field.value === null ? '' : String(field.value)}
-              onValueChange={(v) => field.onChange(v === '' ? undefined : Number(v))}
-            >
+          <Select
+            value={field.value === undefined || field.value === null ? '' : String(field.value)}
+            onValueChange={(v) => field.onChange(v === '' ? undefined : Number(v))}
+          >
+            <FormControl>
               <SelectTrigger><SelectValue placeholder={placeholder ?? '선택'} /></SelectTrigger>
-              <SelectContent>
-                {options.map((o) => <SelectItem key={o.value} value={String(o.value)}>{o.label}</SelectItem>)}
-              </SelectContent>
-            </Select>
-          </FormControl>
+            </FormControl>
+            <SelectContent>
+              {options.map((o) => <SelectItem key={o.value} value={String(o.value)}>{o.label}</SelectItem>)}
+            </SelectContent>
+          </Select>
           <FormMessage />
         </FormItem>
       )}

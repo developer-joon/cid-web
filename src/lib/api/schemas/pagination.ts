@@ -14,13 +14,31 @@ export interface PagedResult<T> {
 }
 
 /**
- * Tolerate two backend page envelope shapes:
+ * Tolerate three backend page envelope shapes:
  * 1. HATEOAS: `{ _embedded?: { <key>: T[] }, page: PageMeta }`
  *    (`_embedded` is omitted when the list is empty)
  * 2. Plain Spring PageImpl: `{ content: T[], number, size, totalElements, totalPages, ... }`
+ * 3. Bare array `T[]` — a few endpoints (e.g. /cis/{id}/history) return
+ *    a flat list with no envelope; treat as a single-page result.
  */
 export function pageSchema<T extends z.ZodTypeAny>(item: T) {
   return z.unknown().transform((raw, ctx): PagedResult<z.infer<T>> => {
+    if (Array.isArray(raw)) {
+      const itemsParse = z.array(item).safeParse(raw);
+      if (!itemsParse.success) {
+        ctx.addIssue({ code: 'custom', message: `페이지 항목 파싱 실패: ${itemsParse.error.message}` });
+        return z.NEVER;
+      }
+      return {
+        content: itemsParse.data,
+        page: {
+          number: 0,
+          size: itemsParse.data.length || 1,
+          totalElements: itemsParse.data.length,
+          totalPages: itemsParse.data.length > 0 ? 1 : 0,
+        },
+      };
+    }
     if (raw === null || typeof raw !== 'object') {
       ctx.addIssue({ code: 'custom', message: '페이지 응답이 객체가 아닙니다.' });
       return z.NEVER;

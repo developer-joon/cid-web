@@ -15,6 +15,27 @@ describe('CiRelationsResponseSchema', () => {
     ]);
     expect(Array.isArray(r)).toBe(true);
   });
+  it('parses HAL/Page envelope with _embedded', () => {
+    const r = CiRelationsResponseSchema.parse({
+      _links: { self: { href: '/api/v1/cis/1/relations' } },
+      _embedded: {
+        relationItemDtoList: [
+          { relId: 1, sourcCiId: 100, trgtCiId: 200, relTpId: 1 },
+        ],
+      },
+      page: { number: 0, size: 20, totalElements: 1, totalPages: 1 },
+    });
+    expect(Array.isArray(r)).toBe(true);
+    expect((r as { relId: number }[])[0].relId).toBe(1);
+  });
+  it('parses empty HAL/Page envelope (no _embedded)', () => {
+    const r = CiRelationsResponseSchema.parse({
+      _links: { self: { href: '/api/v1/cis/1/relations' } },
+      page: { number: 0, size: 20, totalElements: 0, totalPages: 0 },
+    });
+    expect(Array.isArray(r)).toBe(true);
+    expect(r).toHaveLength(0);
+  });
 });
 
 describe('groupRelations', () => {

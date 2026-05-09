@@ -10,10 +10,10 @@ const RevType = z.union([
 
 export const HistoryEntrySchema = z.object({
   rev: z.number().int(),
-  revDt: z.string().optional(),                    // ISO datetime
-  revType: RevType.optional(),
-  username: z.string().optional(),
-  changeReason: z.string().optional(),
+  revDt: z.string().nullish(),                    // ISO datetime
+  revType: RevType.nullish(),
+  username: z.string().nullish(),
+  changeReason: z.string().nullish(),             // backend returns null for absent reason
 });
 export type HistoryEntry = z.infer<typeof HistoryEntrySchema>;
 

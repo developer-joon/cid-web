@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { pageSchema } from './pagination';
 
 export const RelationItemSchema = z.object({
   relId: z.number().int(),
@@ -13,13 +14,20 @@ export const RelationItemSchema = z.object({
 });
 export type RelationItem = z.infer<typeof RelationItemSchema>;
 
-/** Backend may return either {forward, backward} or a flat list. We accept both. */
+/**
+ * Backend may return:
+ *   1. `{forward, backward}` — pre-grouped
+ *   2. a flat array
+ *   3. HAL/Spring Page envelope `{_embedded?: {...List: T[]}, page: ...}`
+ *      (current backend shape)
+ */
 export const CiRelationsResponseSchema = z.union([
   z.object({
     forward: z.array(RelationItemSchema),
     backward: z.array(RelationItemSchema),
   }),
   z.array(RelationItemSchema),
+  pageSchema(RelationItemSchema).transform((p) => p.content),
 ]);
 export type CiRelationsResponse = z.infer<typeof CiRelationsResponseSchema>;
 

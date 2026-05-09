@@ -21,14 +21,14 @@ export function SelectField<TForm extends FieldValues>({ control, name, label, o
       render={({ field }) => (
         <FormItem>
           <FormLabel>{label}</FormLabel>
-          <FormControl>
-            <Select value={(field.value as string | undefined) ?? ''} onValueChange={field.onChange}>
+          <Select value={(field.value as string | undefined) ?? ''} onValueChange={field.onChange}>
+            <FormControl>
               <SelectTrigger><SelectValue placeholder={placeholder ?? '선택'} /></SelectTrigger>
-              <SelectContent>
-                {options.map((o) => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
-              </SelectContent>
-            </Select>
-          </FormControl>
+            </FormControl>
+            <SelectContent>
+              {options.map((o) => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
+            </SelectContent>
+          </Select>
           <FormMessage />
         </FormItem>
       )}
