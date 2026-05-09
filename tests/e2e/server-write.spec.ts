@@ -36,7 +36,7 @@ test.describe('/servers/[ciId]/edit 편집', () => {
   test('OPERATOR — 편집 링크 클릭 → 편집 폼 이동', async ({ page }) => {
     await loginAs(page, oper.username, oper.password);
     await page.goto('/servers');
-    const firstRow = page.locator('a[href^="/servers/"]').first();
+    const firstRow = page.locator('a[href^="/servers/"]:not([href="/servers/new"])').first();
     if (await firstRow.count() === 0) {
       test.skip(true, '서버 목록이 비어 있습니다.');
       return;
@@ -52,7 +52,7 @@ test.describe('/servers/[ciId]/edit 편집', () => {
   test('OPERATOR — 편집 폼에서 설명 필드를 수정하고 저장 버튼 클릭', async ({ page }) => {
     await loginAs(page, oper.username, oper.password);
     await page.goto('/servers');
-    const firstRow = page.locator('a[href^="/servers/"]').first();
+    const firstRow = page.locator('a[href^="/servers/"]:not([href="/servers/new"])').first();
     if (await firstRow.count() === 0) {
       test.skip(true, '서버 목록이 비어 있습니다.');
       return;
@@ -80,7 +80,7 @@ test.describe('폐기 다이얼로그', () => {
   test('OPERATOR — 폐기 버튼 클릭 → 다이얼로그 열림', async ({ page }) => {
     await loginAs(page, oper.username, oper.password);
     await page.goto('/servers');
-    const firstRow = page.locator('a[href^="/servers/"]').first();
+    const firstRow = page.locator('a[href^="/servers/"]:not([href="/servers/new"])').first();
     if (await firstRow.count() === 0) {
       test.skip(true, '서버 목록이 비어 있습니다.');
       return;
@@ -98,7 +98,7 @@ test.describe('폐기 다이얼로그', () => {
   test('OPERATOR — 폐기 다이얼로그: 5자 미만 사유 입력 시 버튼이 작동하지 않음', async ({ page }) => {
     await loginAs(page, oper.username, oper.password);
     await page.goto('/servers');
-    const firstRow = page.locator('a[href^="/servers/"]').first();
+    const firstRow = page.locator('a[href^="/servers/"]:not([href="/servers/new"])').first();
     if (await firstRow.count() === 0) {
       test.skip(true, '서버 목록이 비어 있습니다.');
       return;
@@ -129,7 +129,7 @@ test.describe('폐기 다이얼로그', () => {
     test.skip(skipUnlessLdap(admin), 'ADMIN LDAP 계정 미설정');
     await loginAs(page, admin.username, admin.password);
     await page.goto('/servers');
-    const firstRow = page.locator('a[href^="/servers/"]').first();
+    const firstRow = page.locator('a[href^="/servers/"]:not([href="/servers/new"])').first();
     if (await firstRow.count() === 0) {
       test.skip(true, '서버 목록이 비어 있습니다.');
       return;

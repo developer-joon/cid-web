@@ -6,7 +6,7 @@ const oper = testCreds.operator;
 
 async function goToFirstServerDetail(page: import('@playwright/test').Page) {
   await page.goto('/servers');
-  const firstRow = page.locator('a[href^="/servers/"]').first();
+  const firstRow = page.locator('a[href^="/servers/"]:not([href="/servers/new"])').first();
   if (await firstRow.count() === 0) return false;
   await firstRow.click();
   await expect(page).toHaveURL(/\/servers\/\d+/);

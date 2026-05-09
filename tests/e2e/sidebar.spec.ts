@@ -42,10 +42,14 @@ test.describe('사이드바', () => {
   test('/servers/[ciId] 접근 시 서버 항목이 active 상태 (중첩 경로)', async ({ page }) => {
     await page.goto('/servers');
     // find first server link and navigate to it
-    const firstServerRow = page.locator('a[href^="/servers/"]').first();
+    const firstServerRow = page.locator('a[href^="/servers/"]:not([href="/servers/new"])').first();
+    if (await firstServerRow.count() === 0) {
+      test.skip(true, '서버 목록이 비어 있어 중첩 경로 테스트를 스킵합니다.');
+      return;
+    }
     const href = await firstServerRow.getAttribute('href');
     if (!href) {
-      test.skip(true, '서버 목록이 비어 있어 중첩 경로 테스트를 스킵합니다.');
+      test.skip(true, '서버 링크 href가 없어 스킵합니다.');
       return;
     }
     await page.goto(href);

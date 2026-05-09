@@ -11,9 +11,9 @@ test.describe('인증 — 로그인 / 로그아웃', () => {
     await page.getByLabel(/아이디/).fill('invalid-user-xyz-notexist');
     await page.getByLabel(/비밀번호/).fill('wrong-password-abc');
     await page.getByRole('button', { name: /로그인/ }).click();
-    // Stay on /login, show error
+    // Stay on /login, show error (destructive alert, not the info banner)
     await expect(page).toHaveURL(/\/login/);
-    await expect(page.getByRole('alert')).toBeVisible();
+    await expect(page.locator('[role="alert"].text-destructive')).toBeVisible();
   });
 
   test('유효한 USER 로그인 → 대시보드로 이동', async ({ page }) => {

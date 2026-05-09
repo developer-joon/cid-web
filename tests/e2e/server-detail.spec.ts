@@ -16,7 +16,7 @@ test.describe('/servers/[ciId] 상세', () => {
   test('목록 행 클릭 → 상세 페이지로 이동', async ({ page }) => {
     await loginAs(page, user.username, user.password);
     await page.goto('/servers');
-    const firstRow = page.locator('a[href^="/servers/"]').first();
+    const firstRow = page.locator('a[href^="/servers/"]:not([href="/servers/new"])').first();
     const count = await firstRow.count();
     if (count === 0) {
       test.skip(true, '서버 목록이 비어 있습니다.');
@@ -29,7 +29,7 @@ test.describe('/servers/[ciId] 상세', () => {
   test('기본 정보 카드가 보인다', async ({ page }) => {
     await loginAs(page, user.username, user.password);
     await page.goto('/servers');
-    const firstRow = page.locator('a[href^="/servers/"]').first();
+    const firstRow = page.locator('a[href^="/servers/"]:not([href="/servers/new"])').first();
     if (await firstRow.count() === 0) {
       test.skip(true, '서버 목록이 비어 있습니다.');
       return;
@@ -41,7 +41,7 @@ test.describe('/servers/[ciId] 상세', () => {
   test('IP 주소 탭이 기본으로 활성화된다', async ({ page }) => {
     await loginAs(page, user.username, user.password);
     await page.goto('/servers');
-    const firstRow = page.locator('a[href^="/servers/"]').first();
+    const firstRow = page.locator('a[href^="/servers/"]:not([href="/servers/new"])').first();
     if (await firstRow.count() === 0) {
       test.skip(true, '서버 목록이 비어 있습니다.');
       return;
@@ -55,7 +55,7 @@ test.describe('/servers/[ciId] 상세', () => {
   test('담당자 탭 클릭 시 탭 전환', async ({ page }) => {
     await loginAs(page, user.username, user.password);
     await page.goto('/servers');
-    const firstRow = page.locator('a[href^="/servers/"]').first();
+    const firstRow = page.locator('a[href^="/servers/"]:not([href="/servers/new"])').first();
     if (await firstRow.count() === 0) {
       test.skip(true, '서버 목록이 비어 있습니다.');
       return;
@@ -68,7 +68,7 @@ test.describe('/servers/[ciId] 상세', () => {
   test('관계 탭 클릭 시 탭 전환', async ({ page }) => {
     await loginAs(page, user.username, user.password);
     await page.goto('/servers');
-    const firstRow = page.locator('a[href^="/servers/"]').first();
+    const firstRow = page.locator('a[href^="/servers/"]:not([href="/servers/new"])').first();
     if (await firstRow.count() === 0) {
       test.skip(true, '서버 목록이 비어 있습니다.');
       return;
@@ -81,7 +81,7 @@ test.describe('/servers/[ciId] 상세', () => {
   test('이력 탭 클릭 시 탭 전환', async ({ page }) => {
     await loginAs(page, user.username, user.password);
     await page.goto('/servers');
-    const firstRow = page.locator('a[href^="/servers/"]').first();
+    const firstRow = page.locator('a[href^="/servers/"]:not([href="/servers/new"])').first();
     if (await firstRow.count() === 0) {
       test.skip(true, '서버 목록이 비어 있습니다.');
       return;
@@ -94,7 +94,7 @@ test.describe('/servers/[ciId] 상세', () => {
   test('USER — 편집/폐기 버튼이 없다', async ({ page }) => {
     await loginAs(page, user.username, user.password);
     await page.goto('/servers');
-    const firstRow = page.locator('a[href^="/servers/"]').first();
+    const firstRow = page.locator('a[href^="/servers/"]:not([href="/servers/new"])').first();
     if (await firstRow.count() === 0) {
       test.skip(true, '서버 목록이 비어 있습니다.');
       return;
@@ -108,7 +108,7 @@ test.describe('/servers/[ciId] 상세', () => {
     test.skip(skipUnlessLdap(oper), 'OPERATOR LDAP 계정 미설정');
     await loginAs(page, oper.username, oper.password);
     await page.goto('/servers');
-    const firstRow = page.locator('a[href^="/servers/"]').first();
+    const firstRow = page.locator('a[href^="/servers/"]:not([href="/servers/new"])').first();
     if (await firstRow.count() === 0) {
       test.skip(true, '서버 목록이 비어 있습니다.');
       return;
