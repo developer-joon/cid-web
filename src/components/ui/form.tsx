@@ -19,6 +19,7 @@ type FormFieldContextValue<
 > = { name: TName };
 
 const FormFieldContext = React.createContext<FormFieldContextValue>({} as FormFieldContextValue);
+const FormItemContext = React.createContext<{ id: string }>({ id: '' });
 
 export function FormField<
   TFieldValues extends FieldValues = FieldValues,
@@ -33,37 +34,60 @@ export function FormField<
 
 export function useFormField() {
   const fieldContext = React.useContext(FormFieldContext);
+  const itemContext = React.useContext(FormItemContext);
   if (!fieldContext.name) {
     throw new Error('useFormField must be used within <FormField>');
   }
   const { getFieldState, formState } = useFormContext();
-  return { name: fieldContext.name, ...getFieldState(fieldContext.name, formState) };
+  return {
+    name: fieldContext.name,
+    id: itemContext.id,
+    formItemId: `${itemContext.id}-form-item`,
+    formDescriptionId: `${itemContext.id}-form-item-description`,
+    formMessageId: `${itemContext.id}-form-item-message`,
+    ...getFieldState(fieldContext.name, formState),
+  };
 }
 
 export const FormItem = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => (
-    <div ref={ref} className={cn('space-y-1.5', className)} {...props} />
-  ),
+  ({ className, ...props }, ref) => {
+    const id = React.useId();
+    return (
+      <FormItemContext.Provider value={{ id }}>
+        <div ref={ref} className={cn('space-y-1.5', className)} {...props} />
+      </FormItemContext.Provider>
+    );
+  },
 );
 FormItem.displayName = 'FormItem';
 
-export function FormLabel({ className, ...props }: React.ComponentProps<typeof Label>) {
-  const { error } = useFormField();
+export function FormLabel({ className, htmlFor, ...props }: React.ComponentProps<typeof Label>) {
+  const { error, formItemId } = useFormField();
   return (
-    <Label className={cn(error && 'text-destructive', className)} {...props} />
+    <Label
+      htmlFor={htmlFor ?? formItemId}
+      className={cn(error && 'text-destructive', className)}
+      {...props}
+    />
   );
 }
 
-export function FormControl(props: React.HTMLAttributes<HTMLDivElement>) {
-  return <div {...props} />;
+export function FormControl({ children }: { children: React.ReactElement }) {
+  const { formItemId, formDescriptionId, formMessageId } = useFormField();
+  const childProps = children.props as Record<string, unknown>;
+  return React.cloneElement(children, {
+    // Only inject id if the child doesn't already have one
+    ...(childProps.id ? {} : { id: formItemId }),
+    'aria-describedby': `${formDescriptionId} ${formMessageId}`,
+  } as React.HTMLAttributes<HTMLElement>);
 }
 
 export function FormMessage({ className, children, ...props }: React.HTMLAttributes<HTMLParagraphElement>) {
-  const { error } = useFormField();
+  const { error, formMessageId } = useFormField();
   const body = error ? String(error.message) : children;
   if (!body) return null;
   return (
-    <p className={cn('text-xs text-destructive', className)} {...props}>
+    <p id={formMessageId} className={cn('text-xs text-destructive', className)} {...props}>
       {body}
     </p>
   );

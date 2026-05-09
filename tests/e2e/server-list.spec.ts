@@ -18,7 +18,8 @@ test.describe('/servers 목록', () => {
   test('USER — 검색어 입력 시 URL에 ciNm 파라미터 추가', async ({ page }) => {
     await loginAs(page, user.username, user.password);
     await page.goto('/servers');
-    await page.getByPlaceholder(/호스트명/).fill('zzz-no-such-host-xyz');
+    // There may be multiple placeholders matching /호스트명/; use the enabled ciNm filter
+    await page.locator('input[placeholder*="호스트명"]:not([disabled])').first().fill('zzz-no-such-host-xyz');
     await page.keyboard.press('Enter');
     await expect(page).toHaveURL(/ciNm=zzz-no-such-host-xyz/);
     await expect(page.getByText(/조회된 서버가 없습니다/)).toBeVisible();
