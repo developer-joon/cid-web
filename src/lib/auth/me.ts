@@ -1,6 +1,6 @@
 import 'server-only';
 import { ApiError, unwrapEnvelope, type Envelope } from '@/lib/api/envelope';
-import { getSession, clearSession } from './server';
+import { getSession } from './server';
 import { refreshAccessToken } from './refresh';
 import type { MyProfileResponse } from '@/api/generated/schemas';
 
@@ -29,14 +29,18 @@ export async function getMyProfile(): Promise<MyProfileResponse | null> {
       const fresh = await refreshAccessToken(tokens.refreshToken);
       response = await fetchMe(fresh.accessToken);
     } catch {
-      await clearSession();
+      // Refresh failed — caller (layout) will redirect to /login; the
+      // stale cookie is overwritten on next successful login. We avoid
+      // clearSession() here because Next.js 15 forbids cookie writes
+      // from Server Components.
       return null;
     }
   }
 
   if (!response.ok) {
     if (response.status === 401 || response.status === 403) {
-      await clearSession();
+      // Stale or unauthorized — same rationale as above: don't write
+      // cookies here; let layout redirect and let login overwrite.
       return null;
     }
     throw new ApiError(`HTTP_${response.status}`, response.statusText || 'me failed');
