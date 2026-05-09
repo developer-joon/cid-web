@@ -29,14 +29,14 @@ function pickEntries(sp: SearchParams): [string, string][] {
 
 export default async function VendorListPage({ searchParams }: { searchParams: Promise<SearchParams> }) {
   const sp = await searchParams;
-  const paging = parsePaging(new URLSearchParams(pickEntries(sp)));
+  const paging = parsePaging(new URLSearchParams(pickEntries(sp)), 'vendorId,desc');
   const back = toBackendPageable(paging);
 
   const qs = new URLSearchParams({
     page: String(back.page),
     size: String(back.size),
-    sort: back.sort,
   });
+  if (back.sort) qs.set('sort', back.sort);
   if (sp.vendorNmLike) qs.set('vendorNmLike', sp.vendorNmLike);
   if (sp.vendorTpCd) qs.set('vendorTpCd', sp.vendorTpCd);
   if (sp.useYn) qs.set('useYn', sp.useYn);

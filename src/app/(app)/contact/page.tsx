@@ -31,14 +31,14 @@ function pickEntries(sp: SearchParams): [string, string][] {
 
 export default async function ContactListPage({ searchParams }: { searchParams: Promise<SearchParams> }) {
   const sp = await searchParams;
-  const paging = parsePaging(new URLSearchParams(pickEntries(sp)));
+  const paging = parsePaging(new URLSearchParams(pickEntries(sp)), 'empId,desc');
   const back = toBackendPageable(paging);
 
   const qs = new URLSearchParams({
     page: String(back.page),
     size: String(back.size),
-    sort: back.sort,
   });
+  if (back.sort) qs.set('sort', back.sort);
   if (sp.empNmLike) qs.set('empNmLike', sp.empNmLike);
   if (sp.worldIdLike) qs.set('worldIdLike', sp.worldIdLike);
   if (sp.deptId) qs.set('deptId', sp.deptId);

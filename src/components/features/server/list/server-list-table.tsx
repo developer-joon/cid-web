@@ -11,19 +11,21 @@ import { SERVER_COLUMNS, type ColumnDef } from './server-list-columns';
 interface Props {
   rows: CiListItem[];
   locations: Map<number, MasterLocation>;
-  /** Current sort string e.g. "ciId,desc". */
-  currentSort: string;
+  /** Current sort string e.g. "ciId,desc". Undefined means no active sort. */
+  currentSort?: string;
   /** Builds an `?sort=...` href that retains other params; receives full sort string. */
   buildSortHref: (nextSort: string) => string;
 }
 
-function sortIndicator(currentSort: string, key: string): string {
+function sortIndicator(currentSort: string | undefined, key: string): string {
+  if (!currentSort) return '';
   const [k, dir] = currentSort.split(',');
   if (k !== key) return '';
   return dir === 'asc' ? ' ▲' : ' ▼';
 }
 
-function nextSortFor(currentSort: string, key: string): string {
+function nextSortFor(currentSort: string | undefined, key: string): string {
+  if (!currentSort) return `${key},asc`;
   const [k, dir] = currentSort.split(',');
   if (k !== key) return `${key},asc`;
   return dir === 'asc' ? `${key},desc` : `${key},asc`;

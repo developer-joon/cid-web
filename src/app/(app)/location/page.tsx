@@ -29,14 +29,14 @@ function pickEntries(sp: SearchParams): [string, string][] {
 
 export default async function LocationListPage({ searchParams }: { searchParams: Promise<SearchParams> }) {
   const sp = await searchParams;
-  const paging = parsePaging(new URLSearchParams(pickEntries(sp)));
+  const paging = parsePaging(new URLSearchParams(pickEntries(sp)), 'locId,desc');
   const back = toBackendPageable(paging);
 
   const qs = new URLSearchParams({
     page: String(back.page),
     size: String(back.size),
-    sort: back.sort,
   });
+  if (back.sort) qs.set('sort', back.sort);
   if (sp.siteNmLike) qs.set('siteNmLike', sp.siteNmLike);
   if (sp.floorNmLike) qs.set('floorNmLike', sp.floorNmLike);
   if (sp.tpCd) qs.set('tpCd', sp.tpCd);

@@ -37,15 +37,15 @@ export default async function ServersPage({
   searchParams: Promise<SearchParams>;
 }) {
   const sp = await searchParams;
-  const paging = parsePaging(new URLSearchParams(pickStringEntries(sp)));
+  const paging = parsePaging(new URLSearchParams(pickStringEntries(sp)), 'ciId,desc');
   const back = toBackendPageable(paging);
 
   const backendQs = new URLSearchParams({
     ciTpCd: 'SERVER',
     page: String(back.page),
     size: String(back.size),
-    sort: back.sort,
   });
+  if (back.sort) backendQs.set('sort', back.sort);
   if (sp.ciNm) backendQs.set('ciNm', sp.ciNm);
   if (sp.envrnGpCd) backendQs.set('envrnGpCd', sp.envrnGpCd);
   if (sp.ciStatVal) backendQs.set('ciStatVal', sp.ciStatVal);

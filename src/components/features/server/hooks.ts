@@ -20,8 +20,8 @@ function buildListUrl(p: ServerListParams): string {
     ciTpCd: 'SERVER',
     page: String(back.page),
     size: String(back.size),
-    sort: back.sort,
   });
+  if (back.sort) sp.set('sort', back.sort);
   if (p.ciNm) sp.set('ciNm', p.ciNm);
   if (p.envrnGpCd) sp.set('envrnGpCd', p.envrnGpCd);
   if (p.ciStatVal) sp.set('ciStatVal', p.ciStatVal);
