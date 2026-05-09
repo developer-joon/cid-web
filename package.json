@@ -13,6 +13,7 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "gen:api": "orval --config orval.config.ts",
+    "seed": "node scripts/seed.mjs",
     "format": "prettier --write ."
   },
   "engines": {
