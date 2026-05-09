@@ -24,7 +24,7 @@ test.describe('사이드바', () => {
 
   test('/서버 접근 시 사이드바의 서버 항목이 active 상태', async ({ page }) => {
     await page.goto('/servers');
-    const serverLink = page.getByRole('link', { name: /^서버$/ });
+    const serverLink = page.getByRole('link', { name: /서버/ });
     await expect(serverLink).toBeVisible();
     // active class contains 'bg-primary'
     await expect(serverLink).toHaveClass(/bg-primary/);
@@ -35,7 +35,7 @@ test.describe('사이드바', () => {
     const dashLink = page.getByRole('link', { name: /대시보드/ });
     await expect(dashLink).toHaveClass(/bg-primary/);
     // 서버 링크는 active 아님
-    const serverLink = page.getByRole('link', { name: /^서버$/ });
+    const serverLink = page.getByRole('link', { name: /서버/ });
     await expect(serverLink).not.toHaveClass(/bg-primary/);
   });
 
@@ -49,7 +49,7 @@ test.describe('사이드바', () => {
       return;
     }
     await page.goto(href);
-    const serverLink = page.getByRole('link', { name: /^서버$/ });
+    const serverLink = page.getByRole('link', { name: /서버/ });
     await expect(serverLink).toHaveClass(/bg-primary/);
   });
 
@@ -62,7 +62,7 @@ test.describe('사이드바', () => {
 
   test('서버 메뉴 클릭 시 /servers로 이동', async ({ page }) => {
     await page.goto('/');
-    await page.getByRole('link', { name: /^서버$/ }).click();
+    await page.getByRole('link', { name: /서버/ }).click();
     await expect(page).toHaveURL('/servers');
   });
 });

@@ -27,8 +27,8 @@ test.describe('/servers 목록', () => {
   test('USER — 환경 필터 변경 시 URL에 envrnGpCd 파라미터 추가', async ({ page }) => {
     await loginAs(page, user.username, user.password);
     await page.goto('/servers');
-    // Click the environment filter select
-    const envSelect = page.getByLabel(/환경/).or(page.locator('select[name="envrnGpCd"]')).first();
+    // Page must have rendered correctly regardless of data
+    await expect(page.getByRole('heading', { name: '서버 목록' })).toBeVisible();
     // Try combobox role as the filter might be a shadcn Select
     const envCombobox = page.getByRole('combobox').filter({ hasText: /전체|환경|운영|개발|검수/ });
     if (await envCombobox.count() > 0) {
@@ -44,6 +44,8 @@ test.describe('/servers 목록', () => {
   test('USER — 정렬 헤더 클릭 시 URL sort 파라미터 변경', async ({ page }) => {
     await loginAs(page, user.username, user.password);
     await page.goto('/servers');
+    // Page must have rendered correctly regardless of data
+    await expect(page.getByRole('heading', { name: '서버 목록' })).toBeVisible();
     // CI명 정렬 링크 클릭
     const sortLink = page.getByRole('link', { name: /CI 명|호스트명/ }).first();
     if (await sortLink.count() > 0) {
