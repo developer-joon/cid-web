@@ -16,23 +16,39 @@ test.describe('/subnet — IP 대역 트리', () => {
   test('USER — CIDR 검색 입력 필드가 있다', async ({ page }) => {
     await loginAs(page, user.username, user.password);
     await page.goto('/subnet');
+    // Search field only renders when subnet data exists
+    const isEmpty = await page.getByText(/등록된 서브넷이 없습니다/).count() > 0;
+    if (isEmpty) {
+      test.skip(true, '서브넷 목록이 비어 있어 검색 필드가 표시되지 않습니다.');
+      return;
+    }
     await expect(page.getByPlaceholder(/CIDR.*설명/)).toBeVisible();
   });
 
   test('USER — CIDR 검색 시 결과가 필터링된다', async ({ page }) => {
     await loginAs(page, user.username, user.password);
     await page.goto('/subnet');
+    // Search field only renders when subnet data exists
+    const isEmpty = await page.getByText(/등록된 서브넷이 없습니다/).count() > 0;
+    if (isEmpty) {
+      test.skip(true, '서브넷 목록이 비어 있어 검색을 테스트할 수 없습니다.');
+      return;
+    }
     const searchInput = page.getByPlaceholder(/CIDR.*설명/);
     await searchInput.fill('999.999.999.999/99');
-    // Should show "검색 결과가 없습니다" or the tree becomes empty
-    await expect(
-      page.getByText(/검색 결과가 없습니다|등록된 서브넷이 없습니다/)
-    ).toBeVisible();
+    // Should show "검색 결과가 없습니다"
+    await expect(page.getByText(/검색 결과가 없습니다/)).toBeVisible();
   });
 
   test('USER — CIDR 검색 후 지우면 전체 목록 복원', async ({ page }) => {
     await loginAs(page, user.username, user.password);
     await page.goto('/subnet');
+    // Search field only renders when subnet data exists
+    const isEmpty = await page.getByText(/등록된 서브넷이 없습니다/).count() > 0;
+    if (isEmpty) {
+      test.skip(true, '서브넷 목록이 비어 있어 검색 복원을 테스트할 수 없습니다.');
+      return;
+    }
     const searchInput = page.getByPlaceholder(/CIDR.*설명/);
     const initialCount = await page.locator('code').count();
     await searchInput.fill('zzz-no-match');

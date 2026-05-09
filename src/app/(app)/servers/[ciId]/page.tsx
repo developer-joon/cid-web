@@ -30,7 +30,7 @@ export default async function ServerDetailPage({ params }: { params: Promise<Par
       getSubnetsList(),
     ]);
   } catch (e) {
-    if (e instanceof ApiError && e.code === 'NOT_FOUND') notFound();
+    if (e instanceof ApiError && (e.code === 'NOT_FOUND' || e.code === 'HTTP_404')) notFound();
     throw e;
   }
 
