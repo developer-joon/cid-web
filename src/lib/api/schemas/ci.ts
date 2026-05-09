@@ -1,32 +1,37 @@
 import { z } from 'zod';
 import { pageSchema } from './pagination';
 
-const Yn = z.enum(['Y', 'N']).optional();
+// Backend serializes empty/absent fields as JSON null. Coerce null → undefined
+// so downstream form types remain `T | undefined`.
+const optStr = z.string().nullish().transform((v) => v ?? undefined);
+const optNum = z.number().int().nullish().transform((v) => v ?? undefined);
+const optFloat = z.number().nullish().transform((v) => v ?? undefined);
+const Yn = z.enum(['Y', 'N']).nullish().transform((v) => v ?? undefined);
 
 export const CiServerDataSchema = z.object({
-  hostNm: z.string().optional(),
-  assetId: z.string().optional(),
-  ossId: z.string().optional(),
-  sysVidId: z.string().optional(),
-  deviceNm: z.string().optional(),
-  vendorId: z.number().int().optional(),
-  modelNm: z.string().optional(),
-  serialNo: z.string().optional(),
-  osTpNm: z.string().optional(),
-  osVer: z.string().optional(),
-  cpucoreCnt: z.number().int().optional(),
-  memoryCapa: z.number().optional(),
-  diskCapa: z.number().optional(),
+  hostNm: optStr,
+  assetId: optStr,
+  ossId: optStr,
+  sysVidId: optStr,
+  deviceNm: optStr,
+  vendorId: optNum,
+  modelNm: optStr,
+  serialNo: optStr,
+  osTpNm: optStr,
+  osVer: optStr,
+  cpucoreCnt: optNum,
+  memoryCapa: optFloat,
+  diskCapa: optFloat,
   virtMchnYn: Yn,
-  virtMchnPltfomNm: z.string().optional(),
-  rackId: z.number().int().optional(),
-  introDt: z.string().optional(),
-  maintEndDt: z.string().optional(),
+  virtMchnPltfomNm: optStr,
+  rackId: optNum,
+  introDt: optStr,
+  maintEndDt: optStr,
   monitYn: Yn,
   osBackupYn: Yn,
   alarmCallYn: Yn,
   mngYn: Yn,
-  aciLvlGrd: z.string().optional(),
+  aciLvlGrd: optStr,
   inetFacingYn: Yn,
 });
 export type CiServerData = z.infer<typeof CiServerDataSchema>;
@@ -35,13 +40,13 @@ export const CiListItemSchema = z.object({
   ciId: z.number().int(),
   ciNm: z.string(),
   ciTpCd: z.string(),
-  ciStatVal: z.string().optional(),
-  envrnGpCd: z.string().optional(),
-  ciBizwrkNm: z.string().optional(),
-  grdCd: z.string().optional(),
-  locId: z.number().int().optional(),
-  locName: z.string().optional(),
-  rackName: z.string().optional(),
+  ciStatVal: optStr,
+  envrnGpCd: optStr,
+  ciBizwrkNm: optStr,
+  grdCd: optStr,
+  locId: optNum,
+  locName: optStr,
+  rackName: optStr,
 });
 export type CiListItem = z.infer<typeof CiListItemSchema>;
 
@@ -49,9 +54,9 @@ export const CiListPageSchema = pageSchema(CiListItemSchema);
 export type CiListPage = z.infer<typeof CiListPageSchema>;
 
 export const CiDetailSchema = CiListItemSchema.extend({
-  ciRoleNm: z.string().optional(),
-  ciDescp: z.string().optional(),
-  serverData: CiServerDataSchema.optional(),
+  ciRoleNm: optStr,
+  ciDescp: optStr,
+  serverData: CiServerDataSchema.optional().nullable(),
   appData: z.unknown().optional(),
   cloudData: z.unknown().optional(),
   middlewareData: z.unknown().optional(),

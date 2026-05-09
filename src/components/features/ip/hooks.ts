@@ -11,9 +11,9 @@ export function useCreateIpForCi(ciId: number) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (input: { payload: RegisterIpRequest; changeReason?: string }) => {
-      const data = await apiFetch<unknown>(`/api/proxy/api/v1/cis/${ciId}/ips`, {
+      const data = await apiFetch<unknown>('/api/proxy/api/v1/ips', {
         method: 'POST',
-        body: JSON.stringify(input.payload),
+        body: JSON.stringify({ ...input.payload, ciId }),
         headers: { 'Content-Type': 'application/json' },
         changeReason: input.changeReason,
       });

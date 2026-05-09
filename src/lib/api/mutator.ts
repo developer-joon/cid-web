@@ -69,17 +69,33 @@ export async function apiFetch<T>(url: string, init?: ApiFetchInit): Promise<T> 
     body = await response.json().catch(() => undefined);
   }
 
-  const envelope = body as Envelope<T> | undefined;
-  if (!response.ok || envelope?.error) {
-    const err = envelope?.error;
-    throw new ApiError(
-      err?.code ?? `HTTP_${response.status}`,
-      err?.message ?? response.statusText ?? 'Request failed',
-      err?.traceId ?? traceId,
-    );
+  // Detect envelope shape `{ data?, error? }`. Non-envelope responses
+  // (e.g. POST /vendors returns the created entity directly) are returned
+  // as-is so callers can Zod-parse the raw body.
+  const obj = body !== null && typeof body === 'object' ? (body as Record<string, unknown>) : null;
+  const isEnvelope = obj !== null && ('data' in obj || 'error' in obj);
+
+  if (isEnvelope) {
+    const envelope = body as Envelope<T>;
+    if (!response.ok || envelope.error) {
+      const err = envelope.error;
+      throw new ApiError(
+        err?.code ?? `HTTP_${response.status}`,
+        err?.message ?? response.statusText ?? 'Request failed',
+        err?.traceId ?? traceId,
+      );
+    }
+    return (envelope.data ?? null) as T;
   }
 
-  return (envelope?.data ?? null) as T;
+  if (!response.ok) {
+    throw new ApiError(
+      `HTTP_${response.status}`,
+      response.statusText ?? 'Request failed',
+      traceId,
+    );
+  }
+  return body as T;
 }
 
 export default apiFetch;

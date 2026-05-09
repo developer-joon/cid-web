@@ -9,6 +9,10 @@ export const dynamic = 'force-dynamic';
 
 const BACKEND_URL = process.env.BACKEND_API_URL || 'http://localhost:8080';
 
+// Strip hop-by-hop headers AND browser-only headers that would trigger
+// the backend's CORS check. The proxy is a server-to-server caller —
+// forwarding Origin/Referer makes Spring treat the request as a cross-origin
+// browser request and reject mutating verbs with 403 "Invalid CORS request".
 const HOP_BY_HOP = new Set([
   'connection',
   'keep-alive',
@@ -21,6 +25,8 @@ const HOP_BY_HOP = new Set([
   'host',
   'content-length',
   'cookie',
+  'origin',
+  'referer',
 ]);
 
 interface ProxyContext {
