@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { testCreds, skipUnlessLdap, loginAs } from './_helpers';
+import { testCreds, skipUnlessLdap, loginAs, getMyRoles } from './_helpers';
 
 const oper = testCreds.operator;
 const admin = testCreds.admin;
@@ -128,6 +128,8 @@ test.describe('폐기 다이얼로그', () => {
   test('ADMIN — 폐기 버튼이 보인다', async ({ page }) => {
     test.skip(skipUnlessLdap(admin), 'ADMIN LDAP 계정 미설정');
     await loginAs(page, admin.username, admin.password);
+    const roles = await getMyRoles(page);
+    test.skip(!roles.includes('ADMIN'), `LDAP_TEST_USER_ADMIN(${admin.username})에 ADMIN 권한 미부여 — 실제 권한: [${roles.join(', ')}]`);
     await page.goto('/servers');
     const firstRow = page.locator('a[href^="/servers/"]:not([href="/servers/new"])').first();
     if (await firstRow.count() === 0) {

@@ -56,9 +56,11 @@ test.describe('IP CRUD — CI 상세 IP 탭', () => {
       return;
     }
     await page.getByRole('button', { name: /\+ IP 등록/ }).click();
-    await expect(page.getByRole('dialog')).toBeVisible();
-    await expect(page.getByLabel('IP 주소')).toBeVisible();
-    await expect(page.getByLabel('유형')).toBeVisible();
+    const dialog = page.getByRole('dialog');
+    await expect(dialog).toBeVisible();
+    // Scope to dialog: the IP tab panel is also labelled "IP 주소".
+    await expect(dialog.getByLabel('IP 주소')).toBeVisible();
+    await expect(dialog.getByLabel('유형')).toBeVisible();
   });
 
   test('OPERATOR — IP 등록: 잘못된 IPv4 입력 시 유효성 검증 오류', async ({ page }) => {
@@ -70,12 +72,13 @@ test.describe('IP CRUD — CI 상세 IP 탭', () => {
       return;
     }
     await page.getByRole('button', { name: /\+ IP 등록/ }).click();
-    await expect(page.getByRole('dialog')).toBeVisible();
-    await page.getByLabel('IP 주소').fill('not-an-ip-address');
-    await page.getByRole('button', { name: /저장|등록/ }).click();
+    const dialog = page.getByRole('dialog');
+    await expect(dialog).toBeVisible();
+    await dialog.getByLabel('IP 주소').fill('not-an-ip-address');
+    await dialog.getByRole('button', { name: /저장|등록/ }).click();
     // Dialog stays open due to validation error
-    await expect(page.getByRole('dialog')).toBeVisible();
-    await page.getByRole('button', { name: '취소' }).click();
+    await expect(dialog).toBeVisible();
+    await dialog.getByRole('button', { name: '취소' }).click();
   });
 
   test('OPERATOR — IP 등록: 대역(Subnet) 선택 필드가 보인다', async ({ page }) => {

@@ -26,3 +26,16 @@ export const testCreds = {
 export function skipUnlessLdap(creds: { username: string; password: string }) {
   return !creds.username || !creds.password;
 }
+
+/**
+ * Returns the roles list of the currently logged-in user, parsed from the
+ * dashboard "권한: USER, OPERATOR, ..." line. Caller must already be on
+ * a page that renders the dashboard (i.e. just landed after `loginAs`).
+ */
+export async function getMyRoles(page: Page): Promise<string[]> {
+  await page.goto('/');
+  const roleLine = page.locator('p').filter({ hasText: /^권한:/ }).first();
+  if ((await roleLine.count()) === 0) return [];
+  const text = (await roleLine.textContent()) ?? '';
+  return text.replace(/^권한:\s*/, '').split(',').map((s) => s.trim()).filter(Boolean);
+}

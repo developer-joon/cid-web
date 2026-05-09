@@ -27,6 +27,10 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   workers: 1,
   reporter: 'list',
+  // Bump per-test timeout: Next.js dev compiles routes on first hit, which
+  // can push the very first `loginAs` over the 30s default before /login
+  // and /api/auth/login finish compiling.
+  timeout: 60_000,
   use: {
     baseURL: process.env.E2E_BASE_URL ?? 'http://localhost:3000',
     trace: 'retain-on-failure',

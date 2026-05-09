@@ -59,11 +59,13 @@ test.describe('/vendor — 벤더 관리', () => {
       return;
     }
     await editBtn.click();
-    await expect(page.getByRole('dialog')).toBeVisible();
-    await expect(page.getByLabel('벤더 명')).toBeVisible();
-    // Verify useYn field is available in edit mode for OPERATOR
-    await expect(page.getByLabel('활성')).toBeVisible();
-    await page.getByRole('button', { name: '취소' }).click();
+    const dialog = page.getByRole('dialog');
+    await expect(dialog).toBeVisible();
+    await expect(dialog.getByLabel('벤더 명')).toBeVisible();
+    // Scope to dialog: list page also has a "비활성 포함" filter checkbox
+    // whose label substring-matches '활성'.
+    await expect(dialog.getByLabel('활성')).toBeVisible();
+    await dialog.getByRole('button', { name: '취소' }).click();
     await expect(page.getByRole('dialog')).toHaveCount(0);
   });
 });

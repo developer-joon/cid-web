@@ -53,7 +53,10 @@ test.describe('사이드바', () => {
       return;
     }
     await page.goto(href);
-    const serverLink = page.getByRole('link', { name: /서버/ });
+    // Scope to sidebar: detail page also has a "← 서버 목록" back-link.
+    const serverLink = page
+      .getByRole('complementary')
+      .getByRole('link', { name: /서버/ });
     await expect(serverLink).toHaveClass(/bg-primary/);
   });
 
